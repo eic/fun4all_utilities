@@ -40,52 +40,102 @@ pipeline
 				timestamps { 
 					ansiColor('xterm') {
 						
-						dir('fun4all_coresoftware')
+						dir('work')
 						{
 							
-							checkout(
-								[
-						 			$class: 'GitSCM',
-									extensions: [    
-										[$class: 'CleanBeforeCheckout'], 
-										[$class: 'CleanCheckout'],
-										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
-									],
-									userRemoteConfigs: 
-									[[
-									credentialsId: 'sPHENIX-bot', 
-									url: 'https://github.com/eic/fun4all_coresoftware.git',
-									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
-									]]
-								] //checkout
-							)//checkout				
+							sh ('pwd')
+							sh ('ls -lhv')
 						}
-						dir('fun4all_tutorials')
+						
+						
+						dir('utilities/doxygen/')
 						{
-							checkout(
-								[
-						 			$class: 'GitSCM',
-									extensions: [               
-										[$class: 'CleanBeforeCheckout'], 
-										[$class: 'CleanCheckout'],
-										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
-									],
-									userRemoteConfigs: 
-									[[
-									credentialsId: 'sPHENIX-bot', 
-									url: 'https://github.com/eic/fun4all_tutorials.git',
-									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
-									]]
-								] //checkout
-							)//checkout			
+							sh ("rsync -avl ./ ${WORKSPACE}/work/")
+							
 						}
+						
+						dir('work')
+						{
+							
+						
+							dir('fun4all_coresoftware')
+							{
+								
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [    
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/fun4all_coresoftware.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout				
+							} // dir
+							
+							dir('fun4all_tutorials')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/fun4all_tutorials.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout			
+							} // dir
+						
+						} // dir('work')
 					}
 				}
 			}
 		}//stage('SCM Checkout')
 		
+		stage('Doxygen-build')
+		{
+			
+			steps 
+			{
+				timestamps { 
+					ansiColor('xterm') {
+						
+						dir('work')
+						{
+							
+							sh ('pwd')
+							sh ('ls -lhv')
+							
+							sh ("${singularity_cmd} '/opt/sphenix/utils/bin/doxygen Doxyfile >& doxygen.log'")						
+							
+						}
+						
+					}
+				}
+			}
+		}//stage('SCM Checkout')
 		
 	}//stages
 		
 	
+	post {
+		always{
+		  	script {			
+	            recordIssues enabledForFailure: true, tool: doxygen(pattern: 'work/doxygen.log')    	
+			} // script 
+			
+		} // always
 }//pipeline 
