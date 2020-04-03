@@ -7,13 +7,13 @@
 
 \tableofcontents
 
-Welcome to sPHENIX simulation software documentation!
+Welcome to EIC simulation software documentation!
 
 \section STARTwebsite Start using this website
 
 \subsection UsefulFeatures Highlighted Features
 
-Many feature of the website will help you navigate through the ocean of PHENIX software. Few are highlighted here:
+Many feature of the website will help you navigate through the ocean of source code. Few are highlighted here:
 \li Ever want to find a class or function? It is easy now using the <b>"Search" box</b> on top right of every page. Type few initial letters it will give hints to the rest.
 \li Left side is a <b>navigation bar</b> that expands automatically with your browsing by default. You can also make these two independent of each other by toggling the arrows on left top.
 \li Want to browse the software <b>directory tree</b>? Check out the <a href="files.html"><i>Files</i> button in the navigation bar</a>.
@@ -22,13 +22,13 @@ Many feature of the website will help you navigate through the ocean of PHENIX s
 \li Highlighted <b>source code</b> with crossreferencing. Example click <i>"Go to the source code"</i> in \ref PHG4Hitv1.cc .
 There are many more features, which you are welcome to explore.
 
-\subsection Crossreference Crossreferencing with sPHENIX Git Respository
+\subsection Crossreference Crossreferencing with EIC Git Respository
 
-Through a special build of Doxygen, <a href = "https://github.com/sPHENIX-Collaboration/coresoftware">
-sPHENIX Git Hub respostory</a> were automatically linked for
+Through a special build of Doxygen, <a href = "https://github.com/eic/">
+EIC GitHub respostory</a> were automatically linked for
 Files, directories and member definitions.
-And users can choose between viewing the local copy of the source code (with more features) or the CVS one (most up-to-date).
-Check out links like <EM>View newest version in PHENIX CVS</EM>
+And users can choose between viewing the local copy of the source code (with more features) or the GitHub version (most up-to-date).
+Check out links like <EM>View newest version in GitHub</EM>
 in e.g. PHG4Reco::set_field .
  
 \subsection SlowQA Slow to load?
@@ -49,9 +49,7 @@ Or even more easier, please just take a look at
 <a href="http://www.doxygen.nl/manual/docblocks.html#docexamples">this example</a>, 
 which will show up in <a href="http://www.doxygen.nl/manual/examples/qtstyle/html/class_q_tstyle___test.html">Doxygen page like this</a>. You are also welcome to let <a href="mailto:jhuang@bnl.gov">Jin Huang</a> know, if there is any question or suggestions.
 
-\section OWiki sPHENIX Wiki
 
-<a href = "https://wiki.bnl.gov/sPHENIX/index.php/Main_Page">sPHENIX Wiki</a> provides an up-to-date documentation for sPHENIX construction and analyzers. 
 
 <!-- ================================================================ -->
  */
