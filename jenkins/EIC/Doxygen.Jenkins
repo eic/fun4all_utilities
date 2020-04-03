@@ -1,1 +1,131 @@
+pipeline 
+{
+	agent any
+    
+	stages { 
+		stage('Initialize') 
+		{
+			        
+			steps {
+				timestamps {
+					ansiColor('xterm') {
+						
+						
 
+						//dir('coresoftware') {
+						//	deleteDir()
+						//}
+						sh('rm -fv *.*')
+					
+						sh('hostname')
+						sh('pwd')
+						sh('env')
+						sh('ls -lvhc')
+
+						dir('utilities/jenkins/built-test/') {
+							
+							sh('${singularity_cmd} lsb_release -a')
+						
+						}
+					}
+				}
+			}
+		}
+
+		stage('Git Checkout')
+		{
+			
+			steps 
+			{
+				timestamps { 
+					ansiColor('xterm') {
+						
+						dir('acts-framework') {
+							checkout(
+								[
+						 			$class: 'GitSCM',
+									extensions: [               
+										[$class: 'SubmoduleOption',
+										    disableSubmodules: false,
+										    parentCredentials: true,
+										    recursiveSubmodules: true,
+										    reference: '',
+										    trackingSubmodules: false],
+										[$class: 'CleanBeforeCheckout'], 
+										[$class: 'CleanCheckout'],
+										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+									],
+									userRemoteConfigs: 
+									[[
+									credentialsId: 'sPHENIX-bot', 
+									url: 'https://github.com/sPHENIX-Collaboration/acts-framework.git',
+									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+									]]
+								] //checkout
+							)//checkout						
+						}//	dir('acts-framework') 
+						
+						dir('fun4all_coresoftware')
+						{
+							
+							checkout(
+								[
+						 			$class: 'GitSCM',
+									extensions: [    
+										[$class: 'CleanBeforeCheckout'], 
+										[$class: 'CleanCheckout'],
+										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+									],
+									userRemoteConfigs: 
+									[[
+									credentialsId: 'sPHENIX-bot', 
+									url: 'https://github.com/eic/fun4all_coresoftware.git',
+									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+									]]
+								] //checkout
+							)//checkout				
+						}
+						dir('fun4all_tutorials')
+						{
+							checkout(
+								[
+						 			$class: 'GitSCM',
+									extensions: [               
+										[$class: 'CleanBeforeCheckout'], 
+										[$class: 'CleanCheckout'],
+										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+									],
+									userRemoteConfigs: 
+									[[
+									credentialsId: 'sPHENIX-bot', 
+									url: 'https://github.com/eic/fun4all_tutorials.git',
+									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+									]]
+								] //checkout
+							)//checkout			
+						}
+					}
+				}
+			}
+		}//stage('SCM Checkout')
+		
+		
+	}//stages
+		
+	post {
+		always{
+		  
+		} // always
+	
+		success {
+		
+		}
+		failure {
+		
+		}
+		unstable {
+		
+		}
+	}
+	
+}//pipeline 
