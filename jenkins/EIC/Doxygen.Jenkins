@@ -40,31 +40,6 @@ pipeline
 				timestamps { 
 					ansiColor('xterm') {
 						
-						dir('acts-framework') {
-							checkout(
-								[
-						 			$class: 'GitSCM',
-									extensions: [               
-										[$class: 'SubmoduleOption',
-										    disableSubmodules: false,
-										    parentCredentials: true,
-										    recursiveSubmodules: true,
-										    reference: '',
-										    trackingSubmodules: false],
-										[$class: 'CleanBeforeCheckout'], 
-										[$class: 'CleanCheckout'],
-										[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
-									],
-									userRemoteConfigs: 
-									[[
-									credentialsId: 'sPHENIX-bot', 
-									url: 'https://github.com/sPHENIX-Collaboration/acts-framework.git',
-									refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
-									]]
-								] //checkout
-							)//checkout						
-						}//	dir('acts-framework') 
-						
 						dir('fun4all_coresoftware')
 						{
 							
