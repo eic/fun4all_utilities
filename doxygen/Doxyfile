@@ -142,7 +142,7 @@ STRIP_FROM_PATH        = ./
 STRIP_FROM_INC_PATH    = ./
 
 CVS_LINK_ENABLE        = YES
-CVS_STRIP_FROM_PATH    = /home/phnxbld/sPHENIX/doxygen_sPHENIX/utilities/utils/rebuild
+CVS_STRIP_FROM_PATH    = /var/lib/jenkins/workspace/EIC/doxygen/work
 CVS_URL_PREFIX         = "https://github.com/eic/"
 CVS_URL_SUFIX          = ""
 
