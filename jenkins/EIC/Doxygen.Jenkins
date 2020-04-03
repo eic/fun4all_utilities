@@ -112,7 +112,7 @@ pipeline
 							sh ('pwd')
 							sh ('ls -lhv')
 							
-							sh ("${singularity_cmd} /opt/sphenix/utils/bin/doxygen Doxyfile >& doxygen.log")						
+							sh ("${singularity_cmd} sh doxygen.sh")						
 							
 						}
 						
