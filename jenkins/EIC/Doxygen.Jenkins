@@ -113,19 +113,6 @@ pipeline
 	}//stages
 		
 	post {
-		always{
-		  
-		} // always
-	
-		success {
-		
-		}
-		failure {
-		
-		}
-		unstable {
-		
-		}
 	}
 	
 }//pipeline 
