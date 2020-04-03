@@ -10,18 +10,17 @@ pipeline
 				timestamps {
 					ansiColor('xterm') {
 						
-						
-
-						//dir('coresoftware') {
-						//	deleteDir()
-						//}
-						sh('rm -fv *.*')
 					
 						sh('hostname')
 						sh('pwd')
 						sh('env')
 						sh('ls -lvhc')
 
+						dir('work')
+						{
+							deleteDir()
+						}
+						
 						dir('utilities/jenkins/built-test/') {
 							
 							sh('${singularity_cmd} lsb_release -a')
@@ -40,12 +39,6 @@ pipeline
 				timestamps { 
 					ansiColor('xterm') {
 						
-						dir('work')
-						{
-							
-							sh ('pwd')
-							sh ('ls -lhv')
-						}
 						
 						
 						dir('utilities/doxygen/')
