@@ -34,6 +34,11 @@ fi
 
 echo "-------- publishing ---------"
 
+cd html/
+
+pwd
+ll
+
 git init
 git checkout -b gh-pages
 git status
