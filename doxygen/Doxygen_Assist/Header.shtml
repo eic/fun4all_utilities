@@ -47,7 +47,7 @@ $extrastylesheet
 								<!--END PROJECT_NUMBER-->
 							</div> <!--BEGIN PROJECT_BRIEF-->
 							<div id="projectbrief">
-								Documentation for 
+								Reference for 
 								<a href="https://eic.github.io/">EIC</a> 
 								<a href="https://github.com/eic/">simulation and reconstruction software on GitHub</a>
 							</div> <!--END PROJECT_BRIEF-->
