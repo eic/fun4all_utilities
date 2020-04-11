@@ -238,7 +238,7 @@ pipeline
 							} // dir
 							
 							
-							dir('g4jleic')
+							dir('fun4all_g4jleic')
 							{
 								checkout(
 									[
@@ -251,7 +251,7 @@ pipeline
 										userRemoteConfigs: 
 										[[
 										credentialsId: 'sPHENIX-bot', 
-										url: 'https://github.com/eic/g4jleic.git',
+										url: 'https://github.com/eic/fun4all_g4jleic.git',
 										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
