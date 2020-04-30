@@ -135,7 +135,7 @@ die unless open(IN,$packagefile);
 while (<IN>)
 {
     next if (/^#/);
-    if ($_ =~ /acts-framework/ && $opt_sysname !~ /gcc-8.3/)
+    if ($_ =~ /acts/ && $opt_sysname !~ /gcc-8.3/)
     {
         next;
     }
@@ -182,9 +182,9 @@ $JOBS = sprintf("-j %d",$numcores) if $opt_insure;
 $MAXDEPTH = 4 if $opt_insure;
 
 $workdir = $opt_workdir ? $opt_workdir : '/home/'. $USER . '/' . $collaboration;
-
+my $myhost = `hostname -s`;
 $startTime = time;
-$sysname = $USER.'@'.$HOST.'#'.$Config{osname}.':'.$opt_version;
+$sysname = $USER.'@'.$myhost.'#'.$Config{osname}.':'.$opt_version;
 $compileFlags = ($sysname =~ m/linux/) ? ' INSTALL="/usr/bin/install -D -p" install_sh="/usr/bin/install -D -p"' : "";
 $insureCompileFlags = " ";
 
@@ -413,13 +413,13 @@ else
     }
     foreach my $repo (@gitrepos)
     {
-        if ($repo =~ /acts-framework/)
+        if ($repo =~ /acts/)
         {
-            $gitcommand = sprintf("git clone --branch sphenix-v0.13.00 --recursive -q https://github.com/%s/%s.git",$opt_repoowner, $repo);
+            $gitcommand = sprintf("git clone --branch sPHENIX -q https://github.com/%s/%s.git",$opt_repoowner, $repo);
         }
         else
         {
-            $gitcommand = sprintf("git clone --recursive -q https://github.com/%s/%s.git",$opt_repoowner, $repo);
+            $gitcommand = sprintf("git clone -q https://github.com/%s/%s.git",$opt_repoowner, $repo);
         }
         print LOG $gitcommand, "\n";
         goto END if &doSystemFail($gitcommand);
@@ -588,7 +588,14 @@ print LOG "===========================================\n";
             goto END;
         }
         chdir $dir;
-        system("rsync -a lib  $installDir");
+	if (-d "./lib")
+	{
+	    system("rsync -a lib  $installDir");
+	}
+	if (-d "./lib64")
+	{
+	    system("rsync -a lib64  $installDir");
+	}
         chdir "include";
         make_path($installDir."/include/GenFit", {mode => 0775}) unless -e $installDir."/include/GenFit";
 	system("rsync -a . $installDir/include/GenFit");
@@ -645,9 +652,9 @@ print LOG "===========================================\n";
 	    print LOG "========================================================\n";
 	    print LOG "configuring package $m                                  \n";
 	    print LOG "at $date                                                \n";
-	    if ($m =~ /acts-framework/)
+	    if ($m =~ /acts/)
 	    {
-		$arg = CreateCmakeCommand("acts-framework", $sdir);
+		$arg = CreateCmakeCommand("acts", $sdir);
 	    }
 	    else
 	    {
@@ -713,7 +720,7 @@ if ($opt_stage < 3)
   {
       foreach $m (@package)
       {
-        if ($m =~ /acts-framework/)
+        if ($m =~ /acts/)
         {
           next;
         }
@@ -1540,11 +1547,11 @@ sub CreateCmakeCommand
 {
     my $packagename = shift;
     my $cmakesourcedir = shift;
-    if ($packagename =~ /acts-framework/)
+    if ($packagename =~ /acts/)
     {
         my $g4dir = `find $G4_MAIN/lib64/ -maxdepth 1 -type d | grep Geant4`;
         chomp $g4dir;
-        my $cmakecmd = "cmake -DBOOST_ROOT=${OPT_SPHENIX}/boost -DTBB_ROOT_DIR=${OPT_SPHENIX}/tbb -DEigen3_DIR=${OPT_SPHENIX}/eigen -DROOT_DIR=${ROOTSYS}/cmake -DUSE_GEANT4=ON -DUSE_TGEO=ON -DUSE_PYTHIA8=ON -DPythia8_INCLUDE_DIR=${OPT_SPHENIX}/pythia8/include -DPythia8_LIBRARY=${OPT_SPHENIX}/pythia8/lib/libpythia8.so -DGeant4_DIR=$g4dir -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON  -DCMAKE_INSTALL_PREFIX=$installDir  -Wno-dev";
+	my $cmakecmd = "cmake -DBOOST_ROOT=${OPT_SPHENIX}/boost -DTBB_ROOT_DIR=${OPT_SPHENIX}/tbb -DEigen3_DIR=${OPT_SPHENIX}/eigen/share/eigen3/cmake -DROOT_DIR=${ROOTSYS}/cmake -DACTS_BUILD_TGEO_PLUGIN=ON -DACTS_BUILD_EXAMPLES=ON -DACTS_BUILD_EXAMPLES_PYTHIA8=ON -DACTS_BUILD_EXAMPLES_GEANT4=ON -DPythia8_INCLUDE_DIR=${OPT_SPHENIX}/pythia8/include -DPythia8_LIBRARY=${OPT_SPHENIX}/pythia8/lib/libpythia8.so -DGeant4_DIR=$G4_MAIN -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=$installDir -Wno-dev";
         if ($opt_version =~ /debug/)
         {
             $cmakecmd = sprintf("%s -DCMAKE_BUILD_TYPE=Debug",$cmakecmd);
