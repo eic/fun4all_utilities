@@ -404,6 +404,26 @@ pipeline
 								)//checkout			
 							} // dir
 							
+							dir('eicsmear-jetexample')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/eicsmear-jetexample.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout			
+							} // dir
+							
 							dir('fun4all_eicdetectors')
 							{
 								checkout(
