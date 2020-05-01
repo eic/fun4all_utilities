@@ -138,13 +138,12 @@ pipeline
 							writeFile file: "test.sh", text: """
 #! /bin/bash
 
-source /opt/sphenix/core/bin/sphenix_setup.sh -n ${build_type}
+source /cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/bin/eic_setup.sh -n ${build_type}
 
 env;
 
-cd ../macros/macros/g4simulations/
+cd ../fun4all_macros/macros/g4simulations/
 ls -lhvc
-
 
 root -b -q Fun4All_G4_EICDetector.C
 
@@ -155,7 +154,8 @@ exit \$?
 														
 							sh('ls -lvhc')
 							
-							sh("singularity exec -B cvmfs:/cvmfs cvmfs/sphenix.sdcc.bnl.gov/singularity/rhic_sl7_ext.simg ./test.sh");
+							sh("singularity shell -B cvmfs:/cvmfs cvmfs/eic.opensciencegrid.org/singularity/rhic_sl7_ext.simg
+ ./test.sh");
 							
 							sh('ls -lvhc')
 						}
