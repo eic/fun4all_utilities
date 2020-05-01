@@ -71,7 +71,7 @@ pipeline
 							)//checkout
 						}//						dir('Singularity') {
 						
-						dir('macros') {
+						dir('fun4all_macros') {
 							
 							checkout(
 								[
