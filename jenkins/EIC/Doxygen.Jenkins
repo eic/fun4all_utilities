@@ -405,6 +405,27 @@ pipeline
 							} // dir
 							
 							
+							dir('EicRoot')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/EicRoot.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout			
+							} // dir
+							
+							
 							
 						} // dir('work')
 					}
