@@ -56,7 +56,6 @@ fun4all_coresoftware/offline/packages/trigger|dvp@bnl.gov
 # genfit stuff
 fun4all_coresoftware/offline/packages/PHGenFitPkg/GenFitExp|yuhw.pku@gmail.com
 fun4all_coresoftware/offline/packages/PHGenFitPkg/PHGenFit|yuhw.pku@gmail.com
-fun4all_coresoftware/offline/packages/PHTpcTracker|arkhipkin@bnl.gov
 fun4all_coresoftware/simulation/g4simulation/g4vertex|pinkenburg@bnl.gov
 fun4all_coresoftware/simulation/g4simulation/g4jets|dvp@bnl.gov
 fun4all_coresoftware/offline/packages/jetbackground|dvp@bnl.gov
@@ -67,10 +66,14 @@ fun4all_coresoftware/simulation/g4simulation/g4histos|pinkenburg@bnl.gov
 #fun4all_coresoftware/simulation/g4simulation/g4picoDst|lxue4@gsu.edu
 # Offline tracking software
 fun4all_coresoftware/offline/packages/trackreco|yuhw.pku@gmail.com
+# PHTpcTracker needs libtrack_reco
+fun4all_coresoftware/offline/packages/PHTpcTracker|arkhipkin@bnl.gov
 fun4all_coresoftware/offline/packages/tpccalib|hugo.pereira-da-costa@cea.fr
 # Offline calorimeter software
 fun4all_coresoftware/offline/packages/CaloReco|jhuang@bnl.gov
 fun4all_coresoftware/offline/packages/ClusterIso|dvp@bnl.gov
+# calorimeters and tracking combined
+coresoftware/offline/packages/particleflow|dvp@bnl.gov
 # QA modules that use both simulation and offline libs
 fun4all_coresoftware/offline/QA/modules|jhuang@bnl.gov
 # the dumping needs all objects and comes last
