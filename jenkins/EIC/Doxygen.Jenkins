@@ -426,6 +426,48 @@ pipeline
 							} // dir
 							
 							
+							dir('delphes_EIC')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/delphes_EIC.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout			
+							} // dir
+							
+							
+							dir('EicToyModel')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/master/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/EicToyModel.git',
+										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										]]
+									] //checkout
+								)//checkout			
+							} // dir
+							
+							
 							
 						} // dir('work')
 					}
