@@ -359,7 +359,7 @@ pipeline
 ## Build & test report 
 Report for [commit ${ghprbActualCommit}](${ghprbPullLink}/commits/${ghprbActualCommit}):"""
 				
-			if (${currentBuild.currentResult} == 'FAILURE')
+			if ("${currentBuild.currentResult}" == "FAILURE")
 			{
   				report_content = """${report_content}
 [![Jenkins on fire](https://raw.githubusercontent.com/sPHENIX-Collaboration/utilities/master/jenkins/material/jenkins_logo_fire-128p.png)](${env.BUILD_URL})"""
