@@ -265,8 +265,8 @@ if ($opt_version =~ /play/)
 {
     if ($opt_sysname =~ /gcc-8.3/)
     {
-        $externalPackages{"rave"} = "rave-0.6.25_clhep-2.4.1.3";
-        $externalPackages{"CLHEP"} = "clhep-2.4.1.3";
+#        $externalPackages{"rave"} = "rave-0.6.25_clhep-2.4.1.3";
+#        $externalPackages{"CLHEP"} = "clhep-2.4.1.3";
         $externalPackages{"gsl"} = "gsl-2.6";
     }
     else
@@ -944,8 +944,10 @@ INSTALLONLY:
 $buildSucceeded = 1;
 
 # OK, installation done; move symlink over
+print LOG "removing old installation symlink $inst\n";
 unlink $inst if (-e $inst);
-symlink $linkTarget, $inst;
+print LOG "creating symlink  $inst -> " .  basename($linkTarget) . ", full target: $linkTarget\n";
+symlink basename($linkTarget), $inst;
 # install for scan and coverity build means copying reports which are not in afs
 if ($opt_phenixinstall && !$opt_scanbuild && !$opt_coverity)
 {
