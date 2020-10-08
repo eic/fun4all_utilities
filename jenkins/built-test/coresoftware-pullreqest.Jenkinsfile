@@ -60,7 +60,7 @@ pipeline
 						
 						dir('utilities/jenkins/built-test/') {
 							
-							sh('/usr/bin/singularity exec -B /var/lib/jenkins/singularity/cvmfs:/cvmfs -B /gpfs -B /direct -B /afs -B /sphenix /var/lib/jenkins/singularity/cvmfs/sphenix.sdcc.bnl.gov/singularity/rhic_sl7_ext.simg tcsh -f singularity-check.sh')
+							sh('$singularity_exec_sphenix tcsh -f singularity-check.sh')
 						
 						}
 					}
@@ -363,6 +363,16 @@ Report for [commit ${ghprbActualCommit}](${ghprbPullLink}/commits/${ghprbActualC
 			{
   				report_content = """${report_content}
 [![Jenkins on fire](https://raw.githubusercontent.com/sPHENIX-Collaboration/utilities/master/jenkins/material/jenkins_logo_fire-128p.png)](${env.BUILD_URL})"""
+			}
+			if ("${currentBuild.currentResult}" == "ABORT")
+			{
+  				report_content = """${report_content}
+[![Jenkins aborted](https://raw.githubusercontent.com/sPHENIX-Collaboration/utilities/master/jenkins/material/jenkins_logo_snow-128p.png)](${env.BUILD_URL})"""
+			}
+			if ("${currentBuild.currentResult}" == "SUCCESS")
+			{
+  				report_content = """${report_content}
+[![Jenkins passed](https://raw.githubusercontent.com/sPHENIX-Collaboration/utilities/master/jenkins/material/jenkins_logo_pass-128p.png)](${env.BUILD_URL})"""
 			}
 
   			report_content = """${report_content}

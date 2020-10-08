@@ -1,7 +1,11 @@
 #!/bin/bash
 
-env
+echo "========= Env setup ========="
+source /cvmfs/sphenix.sdcc.bnl.gov/x8664_sl7/opt/sphenix/core/bin/sphenix_setup.sh -n
+source ~/npm/usethis.sh
+env;
 
+echo "========= copy ========="
 ls -lhv
 
 ls -lhv macros/macros/g4simulations/*
@@ -33,6 +37,8 @@ ls -lsv src/*
 pwd;
 ls -lhv;
 
+
+echo "========= Start thumbsup ========="
 thumbsup --config ../utilities/jenkins/built-test/test-tracking-qa-gallery-thumbsup.json
 
 

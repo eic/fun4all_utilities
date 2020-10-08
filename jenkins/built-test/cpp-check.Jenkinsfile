@@ -105,7 +105,7 @@ pipeline
 					steps 
 					{
 						
-						sh ('/usr/bin/singularity exec -B /var/lib/jenkins/singularity/cvmfs:/cvmfs -B /gpfs -B /direct -B /afs -B /sphenix /var/lib/jenkins/singularity/cvmfs/sphenix.sdcc.bnl.gov/singularity/rhic_sl7_ext.simg tcsh -f utilities/jenkins/built-test/cpp-check.sh')
+						sh ('$singularity_exec_sphenix tcsh -f utilities/jenkins/built-test/cpp-check.sh')
 
 		   		}
 				}// Stage - cpp check
@@ -121,6 +121,7 @@ pipeline
 										// 	def buildana = scanForIssues tool: gcc4(pattern: 'build/${build_type}/rebuild.log')
         						//	publishIssues issues: [buildana]
         						recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: cppCheck(pattern: 'cppcheck-result.xml')
+        						// recordIssues enabledForFailure: true, failedNewHigh: 2, failedNewNormal: 2, tool: cppCheck(pattern: 'cppcheck-result.xml')
 									}										
 								} // 				stage('sPHENIX-Build')
 	}//stages
