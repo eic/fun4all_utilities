@@ -172,10 +172,6 @@ if ( $opt_db && $opt_version !~ /pro/)
 # to first order (disk load goes into the load as well)
 my $numcores  = do { local @ARGV='/proc/cpuinfo'; grep /^processor\s+:/, <>;};
 my $JOBS = sprintf("-l %d -j %d", $numcores, $numcores);
-if ($PATH =~ /\/phenix\/u\/phnxbld\/distcc/)
-{
-  $JOBS = "-j 120";
-}
 
 my $MAXDEPTH = ($opt_version =~ m/pro/ || $opt_version =~ /ana/ ) ? 9999999 : 4;
 $opt_version .= '+insure' if $opt_insure;
@@ -266,8 +262,8 @@ if ($opt_version =~ /play/)
 {
     if ($opt_sysname =~ /gcc-8.3/)
     {
-#        $externalPackages{"rave"} = "rave-0.6.25_clhep-2.4.1.3";
-#        $externalPackages{"CLHEP"} = "clhep-2.4.1.3";
+        $externalPackages{"rave"} = "rave-0.6.25_clhep-2.4.1.3";
+        $externalPackages{"CLHEP"} = "clhep-2.4.1.3";
         $externalPackages{"gsl"} = "gsl-2.6";
     }
     else
@@ -1568,8 +1564,17 @@ sub CreateCmakeCommand
         {
             $cmakecmd = sprintf("%s -DCMAKE_BUILD_TYPE=Debug",$cmakecmd);
         }
+	if (defined $CCACHE_DIR)
+	{
+	    my $cxxcompiler = `which g++`;
+	    chomp $cxxcompiler;
+            my $ccompiler = `which gcc`;
+            chomp $ccompiler;
+	    print LOG "using ccache dir $CCACHE_DIR with\nC++ compiler $cxxcompiler\nC compiler $ccompiler\n";
+	    $cmakecmd = sprintf("%s -DCMAKE_CXX_COMPILER=%s -DCMAKE_C_COMPILER=%s",$cmakecmd,$cxxcompiler,$ccompiler);
+	}
         $cmakecmd = sprintf("%s %s",$cmakecmd, $cmakesourcedir);
-        return $cmakecmd;
+	return $cmakecmd;
     }
     print LOG "CreateCmakeCommand not implemented for $packagename\n";
     die;
