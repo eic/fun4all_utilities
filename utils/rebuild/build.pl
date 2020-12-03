@@ -174,7 +174,7 @@ if ( $opt_db && $opt_version !~ /pro/)
 my $numcores  = do { local @ARGV='/proc/cpuinfo'; grep /^processor\s+:/, <>;};
 my $JOBS = sprintf("-l %d -j %d", $numcores, $numcores);
 
-my $MAXDEPTH = ($opt_version =~ m/pro/ || $opt_version =~ /ana/ ) ? 9999999 : 4;
+my $MAXDEPTH = ($opt_version =~ m/pro/ || $opt_version =~ /ana/ || $opt_version =~ /mdc/ ) ? 9999999 : 4;
 $opt_version .= '+insure' if $opt_insure;
 # number of parallel builds with insure
 if ($numcores > 25) {$numcores=25;} # we have 50 insure licenses, only use 1/2 maximum
@@ -958,7 +958,7 @@ if ($opt_phenixinstall && !$opt_scanbuild && !$opt_coverity)
         my $cvmfscatalognestfile = sprintf("%s/.cvmfscatalog",$installDir);
         system("touch $cvmfscatalognestfile");
         my $releasedir = sprintf("/cvmfs/%s/%s/release",$opt_cvmfsvol,$afs_sysname);
-        if ($opt_version =~ /ana/ || $opt_version =~ /pro/)
+        if ($opt_version =~ /ana/ || $opt_version =~ /pro/ || $opt_version =~ /mdc/)
         {
             my $symlinksource = sprintf("release_%s/%s.%d",$opt_version,$opt_version,$releasenumber);
             my $symlinktarget = sprintf("%s/%s.%d",$releasedir,$opt_version,$releasenumber);

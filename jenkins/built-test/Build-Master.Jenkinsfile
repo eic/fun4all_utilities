@@ -303,7 +303,8 @@ pipeline
 									
 									when {
 				    				// case insensitive regular expression for truthy values
-										expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
+										expression { return false } // disable test-default-EICDetector
+										// expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
 									}
 									steps 
 									{
@@ -450,7 +451,7 @@ pipeline
 												    		
 										script
 										{
-											def built = build(job: 'test-default-valgrind-pipeline',
+											def built = build(job: 'test-default-detector-valgrind-pipeline',
 												parameters:
 												[
 													string(name: 'build_src', value: "${build_root_path}"), 
@@ -462,12 +463,12 @@ pipeline
 												],
 												wait: true, propagate: false)
 
-											copyArtifacts(projectName: 'test-default-valgrind-pipeline', selector: specific("${built.number}"));
+											copyArtifacts(projectName: 'test-default-detector-valgrind-pipeline', selector: specific("${built.number}"));
 
 											if ("${built.getResult()}" == 'FAILURE')
 											{
 												currentBuild.result = "${built.getResult()}"
-												error("test-default-valgrind-pipeline #${built.number} ${built.getResult()}");
+												error("test-default-detector-valgrind-pipeline #${built.number} ${built.getResult()}");
 											}
 										}
 						   				    
@@ -766,7 +767,7 @@ pipeline
 				if ("$build_type" == 'clang') {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clang(pattern: 'build/${build_type}/rebuild.log')
 				} else if ("$build_type" == 'scan') {
-					recordIssues enabledForFailure: true, failedNewHigh: 10, failedNewNormal: 10, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
 				} else {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
 				}
