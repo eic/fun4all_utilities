@@ -142,7 +142,7 @@ source /cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/bin/eic_setup.s
 
 env;
 
-cd ../fun4all_macros/macros/g4simulations/
+cd ../fun4all_macros/detectors/EICDetector/
 ls -lhvc
 
 root -b -q Fun4All_G4_EICDetector.C
