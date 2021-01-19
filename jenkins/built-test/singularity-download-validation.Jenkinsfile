@@ -140,11 +140,11 @@ pipeline
 							writeFile file: "test.sh", text: """
 #! /bin/bash
 
-source /opt/sphenix/core/bin/sphenix_setup.sh -n ${build_type}
+source /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/bin/sphenix_setup.sh -n ${build_type}
 
 env;
 
-cd ../macros/macros/g4simulations/
+cd ../macros/detectors/sPHENIX/
 ls -lhvc
 
 

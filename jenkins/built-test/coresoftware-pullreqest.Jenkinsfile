@@ -2,12 +2,35 @@ pipeline
 {
 	agent any
     
-//    environment { 
-//        JenkinsBase = 'jenkins/test/'
-//    }
+	environment {
+		// coorindate for check runs
+		checkrun_repo_commit = "${ghprbGhRepository}/${ghprbActualCommit}"
+	}
        
 	stages { 
 	
+		stage('Checkrun update') 
+		{
+		
+			steps {
+				
+				echo("Building check run coordinate: ")
+				echo("ghprbGhRepository = ${ghprbGhRepository}")
+				echo("ghprbActualCommit = ${ghprbActualCommit}")
+				echo("checkrun_repo_commit = ${checkrun_repo_commit}")
+			
+				build(job: 'github-commit-checkrun',
+					parameters:
+					[
+						string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+						string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+						string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+						string(name: 'checkrun_status', value: "in_progress")
+					],
+					wait: false, propagate: false)
+			} // steps
+		} // stage('Checkrun update') 
+		
 		stage('Initialize') 
 		{
 			
@@ -138,8 +161,9 @@ pipeline
 				   		def built = build(job: 'cpp-check-pipeline',
 			    			parameters:
 			    			[
-							    string(name: 'sha_coresoftware', value: "${sha1}"), 
-							    string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
+							string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+							string(name: 'sha_coresoftware', value: "${sha1}"), 
+							string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 				    			string(name: 'upstream_build_description', value: "${currentBuild.description}"),
 					    		string(name: 'ghprbPullLink', value: "${ghprbPullLink}")
 				    		],
@@ -168,7 +192,8 @@ pipeline
 				   						def built = build(job: 'Build-Master',
 						    			parameters:
 						    			[
-							    			string(name: 'sha_coresoftware', value: "${sha1}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'sha_coresoftware', value: "${sha1}"), 
 							    			string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 							    			booleanParam(name: 'run_cppcheck', value: false), 
 							    			booleanParam(name: 'run_valgrind_test', value: false), 
@@ -223,7 +248,8 @@ pipeline
 			//	   						def built = build(job: 'Build-Master',
 			//			    			parameters:
 			//			    			[
-			//				    			string(name: 'sha_coresoftware', value: "${sha1}"), 
+			//				    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+			//							string(name: 'sha_coresoftware', value: "${sha1}"), 
 			//				    			string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 			//				    			string(name: 'build_type', value: "root6"), 
 			//				    			booleanParam(name: 'run_cppcheck', value: false), 
@@ -250,14 +276,15 @@ pipeline
 				   						def built = build(job: 'Build-Master-gcc8',
 						    			parameters:
 						    			[
-							    			string(name: 'sha_coresoftware', value: "${sha1}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'sha_coresoftware', value: "${sha1}"), 
 							    			string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 							    			string(name: 'build_type', value: "new"), 
 							    			string(name: 'system_config', value: "gcc-8.3"), 
 							    			booleanParam(name: 'run_cppcheck', value: false), 
 							    			booleanParam(name: 'run_default_test', value: true), 
 							    			booleanParam(name: 'run_valgrind_test', value: true), 
-							    			booleanParam(name: 'run_calo_qa', value: false), 
+							    			booleanParam(name: 'run_calo_qa', value: true), 
 							    			booleanParam(name: 'run_DST_readback', value: true), 
 				    						string(name: 'upstream_build_description', value: "${currentBuild.description}"), 
 				    						string(name: 'ghprbPullLink', value: "${ghprbPullLink}")
@@ -284,7 +311,8 @@ pipeline
 				   						def built = build(job: 'Build-Clang',
 						    			parameters:
 						    			[
-							    			string(name: 'sha_coresoftware', value: "${sha1}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'sha_coresoftware', value: "${sha1}"), 
 							    			string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 							    			booleanParam(name: 'run_valgrind_test', value: false), 
 							    			booleanParam(name: 'run_default_test', value: false), 
@@ -315,7 +343,8 @@ pipeline
 				   						def built = build(job: 'Build-ScanBuild',
 						    			parameters:
 						    			[
-							    			string(name: 'sha_coresoftware', value: "${sha1}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'sha_coresoftware', value: "${sha1}"), 
 							    			string(name: 'git_url_coresoftware', value: "https://github.com/${ghprbGhRepository}.git"), 
 							    			booleanParam(name: 'run_DST_readback', value: false), 
 							    			booleanParam(name: 'run_cppcheck', value: false), 
@@ -378,7 +407,7 @@ Report for [commit ${ghprbActualCommit}](${ghprbPullLink}/commits/${ghprbActualC
 			}
 
   			report_content = """${report_content}
-* [![Build Status](https://web.racf.bnl.gov/jenkins-sphenix/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) [builds and tests overall are ${currentBuild.currentResult}](${env.BUILD_URL})."""
+* [![Build Status](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) [builds and tests overall are ${currentBuild.currentResult}](${env.BUILD_URL})."""
 				
     			def files = findFiles(glob: '*.md')
     			echo("all reports: $files");
@@ -406,7 +435,7 @@ _Automatically generated by [sPHENIX Jenkins continuous integration](${env.JOB_D
     			
 			  	writeFile file: "summary.md", text: "${report_content}"		
 			  	
-					build(job: 'github-comment-label',
+				build(job: 'github-comment-label',
 					  parameters:
 					  [
 							string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
@@ -415,6 +444,21 @@ _Automatically generated by [sPHENIX Jenkins continuous integration](${env.JOB_D
 						],
 						wait: false, propagate: false)
 			  	
+				build(job: 'github-commit-checkrun',
+					parameters:
+					[
+						string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+						string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+						string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+						string(name: 'checkrun_status', value: "completed"),
+						string(name: 'checkrun_conclusion', value: "${currentBuild.currentResult}"),
+						string(name: 'output_title', value: "sPHENIX Jenkins Report for ${env.JOB_NAME}"),
+						string(name: 'output_summary', value: "[![Build Status](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) [builds and tests overall are ${currentBuild.currentResult}](${env.BUILD_URL})."),
+						string(name: 'output_text', value: "${currentBuild.displayName}\n\n${currentBuild.description}")
+					],
+					wait: false, propagate: false
+				) // build(job: 'github-commit-checkrun',
+			
 				}// script
 				
 			}

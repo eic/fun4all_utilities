@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ "$#" -ne 3 ]; then	
-	echo "Usage $0 particle_name pT_GeV number_jobs"
+if [ "$#" -ne 2 ]; then	
+	echo "Usage $0 num_event number_jobs"
 	exit 1;
 fi
 
@@ -15,11 +15,11 @@ if [ -z "${build_type}" ]; then
 	exit 1;
 fi
 
-particle_ID=$1;
-pT_GeV=$2;
-number_jobs=$3; 
 
-name=${particle_ID}_pT${pT_GeV}_Sum${number_jobs}
+num_event=$1;
+number_jobs=$2;
+
+name=test-tracking_Event${num_event}_Sum${number_jobs}
 
 detector_name=sPHENIX
 macro_name="Fun4All_G4_${detector_name}";
@@ -47,16 +47,18 @@ cd ${macro_dir}
 pwd;
 ls -lhc
 
+
+
 id_number=1
 while [ $id_number -le $number_jobs ]
 do
-	job_name=${particle_ID}_pT${pT_GeV}_${id_number}
+	job_name=job_${id_number}
   
 	echo "======================================================="
 	echo "${job_name}: Start test";
 	echo "======================================================="
   
-  	(/usr/bin/time -v root -b -q "Fun4All_G4_sPHENIX.C(20,"\"${particle_ID}\"",${pT_GeV},"\"G4sPHENIX_${job_name}\"")" && echo $? > exit_code_${id_number}.log ) 2>&1 | tee G4sPHENIX_${job_name}.log | (head; tail)  &
+  	(/usr/bin/time -v root -b -q "Fun4All_G4_sPHENIX.C(${num_event},"\"NullInput\"","\"G4sPHENIX_${job_name}\"")" && echo $? > exit_code_${id_number}.log ) 2>&1 | tee G4sPHENIX_${job_name}.log | (head; tail)  &
 	
   	sleep 1s;
 	((id_number++))
@@ -89,9 +91,25 @@ ls -lhcrt
 echo "======================================================="
 echo "${name}: go to QA directory";
 echo "======================================================="
+
+if [ -f "README.md" ]; then
+    cp -fv README.md $WORKSPACE/QA-gallery/Fun4All-macros-README.md
+else
+	echo "missing README.md at " $PWD
+fi
+
 cd $WORKSPACE/QA-gallery
 pwd
 ls -lhv
+
+export qa_file_name_new=G4sPHENIX_${name}_qa.root
+echo "======================================================="
+echo "${name}: Merging output to $qa_file_name_new";
+echo "======================================================="
+
+echo hadd -f $qa_file_name_new ${macro_dir}/G4sPHENIX_job*_qa.root
+hadd -f $qa_file_name_new ${macro_dir}/G4sPHENIX_job*_qa.root
+
 
 echo "======================================================="
 echo "${name}: Reference";
@@ -102,20 +120,15 @@ echo "use reference = ${use_reference}"
 if [ ${use_reference} ]; then
 	ln -svfb ../reference
 	
-	export qa_file_name_ref=`/bin/ls -1 reference/G4sPHENIX_${particle_ID}_pT${pT_GeV}_Sum*_qa.root`
+	export qa_file_name_ref=`/bin/ls -1 reference/G4sPHENIX_*Sum*_qa.root`
 	
 	echo "Reference file: with $qa_file_name_ref"
 	ls -lhvc $qa_file_name_ref
 	
 fi
 
-export qa_file_name_new=G4sPHENIX_${name}_qa.root
-echo "======================================================="
-echo "${name}: Merging output to $qa_file_name_new";
-echo "======================================================="
 
-echo hadd -f $qa_file_name_new ${macro_dir}/G4sPHENIX_${particle_ID}_pT${pT_GeV}_*_qa.root
-hadd -f $qa_file_name_new ${macro_dir}/G4sPHENIX_${particle_ID}_pT${pT_GeV}_*_qa.root
+
 
 # echo "======================================================="
 # echo fake fast runs !! Remove before release!
@@ -154,8 +167,7 @@ do
 		echo "${nbname}: Failed build with return = ${build_ret}. ";
 		echo "======================================================="
 		exit $build_ret;
-	fi
-	
+	fi	
 done <<< "$notebooks"
 
 
@@ -166,8 +178,8 @@ echo "======================================================="
 
 git status
 
-git commit -am "Processing ${particle_ID}_pT${pT_GeV} at $JOB_URL"
-git tag -a $git_tag -m "Build by sPHENIX Jenkins CI for QA config ${particle_ID}_pT${pT_GeV} at $JOB_URL"
+git commit -am "Processing tracking QA at $JOB_URL"
+git tag -a $git_tag -m "Build by sPHENIX Jenkins CI at $JOB_URL"
 git push origin $git_tag
 
 
@@ -182,7 +194,7 @@ do
 	# nbname=QA-calorimeter.ipynb 
 	filename=`basename ${nbname} .ipynb`
 	
-	summary="* [:bar_chart: ${filename} for ${particle_ID} at p_T=${pT_GeV}GeV](https://nbviewer.jupyter.org/github/sPHENIX-Collaboration/QA-gallery/blob/${git_tag}/${nbname})"
+	summary="* [:bar_chart: ${filename}](https://nbviewer.jupyter.org/github/sPHENIX-Collaboration/QA-gallery/blob/${git_tag}/${nbname})"
 	
 	if [ -f "${filename}.txt" ]; then
 		
@@ -192,14 +204,12 @@ do
     	summary="$summary : $notebook_summary"
 	fi
 	
-	echo "$summary" > report-${nbname}-${particle_ID}_pT${pT_GeV}.md
+	echo "$summary" > report-${nbname}.md
 
-	ls -lhvc report-${nbname}-${particle_ID}_pT${pT_GeV}.md
-	cat report-${nbname}-${particle_ID}_pT${pT_GeV}.md
+	ls -lhvc report-${nbname}.md
+	cat report-${nbname}.md
 
-	mv -fv ${filename}.html ${nbname}-${particle_ID}_pT${pT_GeV}.html
+	# mv -fv ${filename}.html ${nbname}.html
 	
 done <<< "$notebooks"
-
-
 

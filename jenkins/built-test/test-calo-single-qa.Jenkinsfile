@@ -11,6 +11,22 @@ pipeline
        
 	stages { 
 	
+		stage('Checkrun update') 
+		{
+		
+			steps {
+				build(job: 'github-commit-checkrun',
+				parameters:
+				[
+					string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+					string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+					string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+					string(name: 'checkrun_status', value: "in_progress")
+				],
+				wait: false, propagate: false)
+			} // steps
+		} // stage('Checkrun update') 
+		
 		stage('Prebuild-Cleanup') 
 		{
 			
@@ -31,20 +47,20 @@ pipeline
 					
 						script {
 						
-							currentBuild.description = "${upstream_build_description}"  
+							currentBuild.description = "${upstream_build_description}" 
 			
 							if (fileExists('./install'))
 							{
-								sh "rm -fv ./install"
+								sh "rm -frv ./install"
 							}
 							if (fileExists('./calibrations'))
 							{
-								sh "rm -fv ./calibrations"
+								sh "rm -frv ./calibrations"
 							}						
 							if (fileExists('./build'))
 							{
-								sh "rm -fv ./build"
-							}						
+								sh "rm -frv ./build"
+							}							
 						}						
     				
 						echo("link builds to ${build_src}")
@@ -56,15 +72,30 @@ pipeline
 							deleteDir()
 						}	
 
-						dir('coresoftware') {
+						dir('coresoftware') 
+						{
 							deleteDir()
 						}
 
 						dir('report')
 						{
 							deleteDir()
-    				}
-    				
+    					}
+						
+						dir('QA-gallery')
+						{
+							deleteDir()
+    					}
+    					
+						dir('qa_html')
+						{
+							deleteDir()
+    					}
+    					
+						dir('reference')
+						{
+							deleteDir()
+    					}
 						sh('ls -lvhc')
 						
 						slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
@@ -90,7 +121,7 @@ pipeline
     				
 						dir('utilities/jenkins/built-test/') {
 							
-							sh('$singularity_exec_sphenix tcsh -f singularity-check.sh ${build_type}')
+							sh('$singularity_exec_sphenix_farm  tcsh singularity-check.sh ${build_type}')
 						
 						}
 						
@@ -117,16 +148,16 @@ pipeline
 							   		[$class: 'CleanCheckout'],     
 							     	[
 							   			$class: 'PreBuildMerge',
-							    		options: [
+							    			options: [
 											mergeRemote: 'origin',
-							  			mergeTarget: 'calo-single-qa'
+							  				mergeTarget: 'QA-calorimeter-single-particle'
 							  			]
 							    	],   
 							     	[
 							   			$class: 'PreBuildMerge',
-							    		options: [
+							    			options: [
 											mergeRemote: 'origin',
-							  			mergeTarget: 'master'
+							  				mergeTarget: 'master'
 							  			]
 							    	],
 						   		],
@@ -145,10 +176,30 @@ pipeline
 							
     				}	
     				
-    				// for QA macros, just use the default repository then...
-						dir('coresoftware') {
-							git credentialsId: 'sPHENIX-bot', url: 'https://github.com/sPHENIX-Collaboration/coresoftware.git'
-						}
+				
+						dir('QA-gallery')
+						{			
+							
+							checkout(
+								[
+						 			$class: 'GitSCM',
+						   		extensions: [               
+							   		[$class: 'CleanCheckout'],  
+						   		],
+							  	branches: [
+							    		[name: "${sha_QA_gallery}"]
+							    	], 
+							  	userRemoteConfigs: 
+							  	[[
+							     	credentialsId: 'sPHENIX-bot', 
+							     	url: '${git_url_QA_gallery}',
+							     	refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/main:refs/remotes/origin/main'), 
+							    	branch: ('*')
+							  	]]
+								] //checkout
+							)//checkout
+							
+    						}	
 						
 					}
 				}
@@ -158,12 +209,16 @@ pipeline
 		stage('Copy reference')
 		{
 			
+			when {
+    			// case insensitive regular expression for truthy values
+					expression { return use_reference ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+			}
 			steps 
 			{
 				timestamps { 
 					ansiColor('xterm') {
 						
-						dir('macros/macros/QA/calorimeter/reference')
+						dir('reference')
 						{
     					copyArtifacts(projectName: "test-calo-single-qa-reference", selector: lastSuccessful());
 
@@ -182,7 +237,7 @@ pipeline
 			steps 
 			{
 					
-				sh('$singularity_exec_sphenix tcsh -f utilities/jenkins/built-test/test-calo-single-qa.sh $build_type e- 4 15')
+				sh('$singularity_exec_sphenix_farm sh utilities/jenkins/built-test/test-calo-single-qa.sh e- 4 15')
 														
 			}				
 					
@@ -194,52 +249,44 @@ pipeline
 			steps 
 			{
 					
-				sh('$singularity_exec_sphenix tcsh -f utilities/jenkins/built-test/test-calo-single-qa.sh $build_type pi+ 30 15')
+				sh('$singularity_exec_sphenix_farm sh utilities/jenkins/built-test/test-calo-single-qa.sh pi+ 30 15')
 				
-				archiveArtifacts artifacts: 'macros/macros/QA/calorimeter/G4sPHENIX_*_Sum*_qa.root*'										
+				// archiveArtifacts artifacts: 'macros/macros/QA/calorimeter/G4sPHENIX_*_Sum*_qa.root*'										
 			}				
 					
+		}
+		stage('archiveArtifacts')
+		{
+			steps 
+			{
+				archiveArtifacts artifacts: 'QA-gallery/G4sPHENIX_*_Sum*_qa.root*'										
+			}								
 		}
 		
 		stage('html-report')
 		{
 			steps 
-			{
+			{	
 			
-			
-				script{
-			    def built = build(job: 'test-calo-single-qa-gallery',
-			    	parameters:
-			    	[
-			    		string(name: 'build_src', value: "${env.JOB_NAME}"),
-			    		string(name: 'src_build_id', value: "${env.BUILD_NUMBER}"), 
-			  			string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			  		],
-			    	wait: true, propagate: true)	
-				  
-				  copyArtifacts(projectName: 'test-calo-single-qa-gallery', selector: specific("${built.number}"));
-				}
-				
-				
 				dir('qa_html')
-				{
-					sh('ls -lhv')
-				
-					archiveArtifacts artifacts: 'qa_page.tar.gz'
-					
-    			sh ("tar xzfv ./qa_page.tar.gz")
-    			
+				{					
 					sh('ls -lhv')
 				}
-
-				  publishHTML (target: [
-			      allowMissing: false,
-			      alwaysLinkToLastBuild: false,
-			      keepAll: true,
-			      reportDir: 'qa_html',
-			      reportFiles: 'index.html',
-			      reportName: "QA Report"
-			    ])
+			
+				sh("cp -fv QA-gallery/*.html qa_html/");
+				
+				script {
+					def html_files = findFiles(glob: 'qa_html/*.html').join(',')
+					echo("all html_files: $html_files");
+					publishHTML (target: [
+					      allowMissing: false,
+					      alwaysLinkToLastBuild: false,
+					      keepAll: true,
+					      reportDir: 'qa_html',
+					      reportFiles: "$html_files",
+					      reportName: "QA Report"
+					    ])
+				}
 			}			// steps	
 					
 		}
@@ -251,17 +298,61 @@ pipeline
 	
 		always{
 		  
+			//  writeFile file: "QA-calo.md", text: "* [![Build Status ](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Calorimeter QA: [build is ${currentBuild.currentResult}](${env.BUILD_URL}), [:bar_chart:QA report - Calorimeter](${env.BUILD_URL}/QA_20Report/) "				
 			dir('report')
 			{
-			  writeFile file: "QA-calo.md", text: "* [![Build Status ](https://web.racf.bnl.gov/jenkins-sphenix/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Calorimeter QA: [build is ${currentBuild.currentResult}](${env.BUILD_URL}), [:bar_chart:QA report - Calorimeter](${env.BUILD_URL}/QA_20Report/) "				
+				echo("start report building to ...");
+				sh ('pwd');
 			}
-		  		  
+			script
+			{								
+				currentBuild.description = "${currentBuild.description}\n## Result QA reports:"
+				
+				def report_content = "* [![Build Status ](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Calorimeter QA: [build is ${currentBuild.currentResult}](${env.BUILD_URL})";	        
+
+				def files = findFiles(glob: 'QA-gallery/report*.md')
+				echo("all reports: $files");
+				// def testFileNames = files.split('\n')
+				for (def fileEntry : files) 
+				{    			
+					String file = fileEntry.path;    				
+
+					String fileContent = readFile(file).trim();
+
+					echo("$file  -> ${fileContent}");
+
+					// update report summary
+					report_content = "${report_content}\n  ${fileContent}"		//nested list for child reports
+
+					// update build description
+					currentBuild.description = "${currentBuild.description}\n${fileContent}"		
+				}    			
+
+				writeFile file: "report/QA-calo.md", text: "${report_content}"	
+
+			}//script
+			
 			archiveArtifacts artifacts: 'report/*.md'
+			
+			build(job: 'github-commit-checkrun',
+				parameters:
+				[
+					string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+					string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+					string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+					string(name: 'checkrun_status', value: "completed"),
+					string(name: 'checkrun_conclusion', value: "${currentBuild.currentResult}"),
+					string(name: 'output_title', value: "sPHENIX Jenkins Report for ${env.JOB_NAME}"),
+					string(name: 'output_summary', value: "* [![Build Status ](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Calorimeter QA: [build is ${currentBuild.currentResult}](${env.BUILD_URL})"),
+					string(name: 'output_text', value: "${currentBuild.displayName}\n\n${currentBuild.description}")
+				],
+				wait: false, propagate: false
+			) // build(job: 'github-commit-checkrun',
 		}
 
 		success {
 			script {
-				currentBuild.description = "${upstream_build_description}<br><button onclick=\"window.location.href='${JENKINS_URL}/job/sPHENIX/job/test-calo-single-qa-reference/parambuild/?ref_build_id=${BUILD_ID}';\">Use as QA reference</button>"  
+				currentBuild.description = "${currentBuild.description}<br><button onclick=\"window.location.href='${JENKINS_URL}/job/sPHENIX/job/test-calo-single-qa-reference/parambuild/?ref_build_id=${BUILD_ID}';\">Use as QA reference</button>"  
 			}
 			
 			build(job: 'github-comment-label',

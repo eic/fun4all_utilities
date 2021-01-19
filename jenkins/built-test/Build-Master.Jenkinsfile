@@ -7,6 +7,22 @@ pipeline
 //    }
        
 	stages { 
+		stage('Checkrun update') 
+		{
+		
+			steps {
+				build(job: 'github-commit-checkrun',
+				parameters:
+				[
+					string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+					string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+					string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+					string(name: 'checkrun_status', value: "in_progress")
+				],
+				wait: false, propagate: false)
+			} // steps
+		} // stage('Checkrun update')
+		
 		stage('Initialize') 
 		{
 			
@@ -260,81 +276,7 @@ pipeline
 						stage('Test')
 						{
 							parallel {
-																
-								stage('test-default-fsPHENIX')
-								{
 									
-									when {
-				    				// case insensitive regular expression for truthy values
-										expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
-									}
-									steps 
-									{
-										//sh('/usr/bin/singularity exec -B /var/lib/jenkins/singularity/cvmfs:/cvmfs -B /gpfs -B /direct -B /afs -B /sphenix /var/lib/jenkins/singularity/cvmfs/sphenix.sdcc.bnl.gov/singularity/rhic_sl7_ext.simg tcsh -f utilities/jenkins/built-test/test-default.sh')
-												    		
-										script
-										{
-				   						def built = build(job: 'test-default-pipeline',
-						    			parameters:
-						    			[
-							    			string(name: 'build_src', value: "${build_root_path}"), 
-							    			string(name: 'build_type', value: "${build_type}"), 
-							    			string(name: 'system_config', value: "${system_config}"), 
-							    			string(name: 'sha_macros', value: "${sha_macros}"), 
-		    								string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-		    								string(name: 'macro_name', value: "Fun4All_G4_fsPHENIX"), 
-				    						string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    						],
-						    			wait: true, propagate: false)
-						   										
-						   				copyArtifacts(projectName: 'test-default-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
-						   				if ("${built.result}" != 'SUCCESS')
-						   				{
-						   					error('test-default-fsPHENIX FAIL')
-    									}							
-										}
-						   			
-						   				    
-									}								
-								}// 				stage('test-default-fsPHENIX')
-								
-								stage('test-default-EICDetector')
-								{
-									
-									when {
-				    				// case insensitive regular expression for truthy values
-										expression { return false } // disable test-default-EICDetector
-										// expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
-									}
-									steps 
-									{
-										//sh('/usr/bin/singularity exec -B /var/lib/jenkins/singularity/cvmfs:/cvmfs -B /gpfs -B /direct -B /afs -B /sphenix /var/lib/jenkins/singularity/cvmfs/sphenix.sdcc.bnl.gov/singularity/rhic_sl7_ext.simg tcsh -f utilities/jenkins/built-test/test-default.sh')
-												    		
-										script
-										{
-				   						def built = build(job: 'test-default-pipeline',
-						    			parameters:
-						    			[
-							    			string(name: 'build_src', value: "${build_root_path}"), 
-							    			string(name: 'build_type', value: "${build_type}"), 
-							    			string(name: 'system_config', value: "${system_config}"), 
-							    			string(name: 'sha_macros', value: "${sha_macros}"), 
-		    								string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-		    								string(name: 'macro_name', value: "Fun4All_G4_EICDetector"), 
-				    						string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    						],
-						    			wait: true, propagate: false)
-						   										
-						   				copyArtifacts(projectName: 'test-default-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
-						   				if ("${built.result}" != 'SUCCESS')
-						   				{
-						   					error('test-default-EICDetector FAIL')
-    									}							
-										}
-						   				    
-									}								
-								}// 				stage('test-default-EICDetector')
-								
 								stage('test-default-detector-sPHENIX')
 								{
 									
@@ -346,25 +288,27 @@ pipeline
 									{			    		
 										script
 										{
-				   						def built = build(job: 'test-default-detector-pipeline',
-						    			parameters:
-						    			[
-							    			string(name: 'build_src', value: "${build_root_path}"), 
-							    			string(name: 'build_type', value: "${build_type}"), 
-							    			string(name: 'system_config', value: "${system_config}"), 
-							    			string(name: 'sha_macros', value: "${sha_macros}"), 
-		    								string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-		    								string(name: 'detector_name', value: "sPHENIX"), 
-				    						string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    						],
-						    			wait: true, propagate: false)
-						   										
-						   				copyArtifacts(projectName: 'test-default-detector-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
-						   				if ("${built.result}" != 'SUCCESS')
-						   				{
-						   					error('test-default-detector-sPHENIX FAIL')
-    									}							
-										}
+											def built = build(job: 'test-default-detector-pipeline',
+												parameters:
+												[
+													string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+													string(name: 'build_src', value: "${build_root_path}"), 
+													string(name: 'build_type', value: "${build_type}"), 
+													string(name: 'system_config', value: "${system_config}"), 
+													string(name: 'sha_macros', value: "${sha_macros}"), 
+													string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
+													string(name: 'detector_name', value: "sPHENIX"), 
+													string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
+												],
+												wait: true, propagate: false)
+
+											copyArtifacts(projectName: 'test-default-detector-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
+
+											if ("${built.result}" != 'SUCCESS')
+											{
+												error('test-default-detector-sPHENIX FAIL')
+											}							
+										}// script
 									}				
 								} // stage('test-default-detector-sPHENIX')
 								
@@ -382,7 +326,8 @@ pipeline
 				   						def built = build(job: 'test-default-detector-pipeline',
 						    			parameters:
 						    			[
-							    			string(name: 'build_src', value: "${build_root_path}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'build_src', value: "${build_root_path}"), 
 							    			string(name: 'build_type', value: "${build_type}"), 
 							    			string(name: 'system_config', value: "${system_config}"), 
 							    			string(name: 'sha_macros', value: "${sha_macros}"), 
@@ -417,7 +362,8 @@ pipeline
 				   						def built = build(job: 'test-default-detector-pipeline',
 						    			parameters:
 						    			[
-							    			string(name: 'build_src', value: "${build_root_path}"), 
+							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+										string(name: 'build_src', value: "${build_root_path}"), 
 							    			string(name: 'build_type', value: "${build_type}"), 
 							    			string(name: 'system_config', value: "${system_config}"), 
 							    			string(name: 'sha_macros', value: "${sha_macros}"), 
@@ -454,6 +400,7 @@ pipeline
 											def built = build(job: 'test-default-detector-valgrind-pipeline',
 												parameters:
 												[
+													string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
 													string(name: 'build_src', value: "${build_root_path}"), 
 													string(name: 'build_type', value: "${build_type}"), 
 													string(name: 'system_config', value: "${system_config}"), 
@@ -491,6 +438,7 @@ pipeline
 											def built = build(job: 'test-DST-readback',
 												parameters:
 												[
+													string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
 													string(name: 'build_src', value: "${build_root_path}"), 
 													string(name: 'build_type', value: "${build_type}"), 
 													string(name: 'system_config', value: "${system_config}"), 
@@ -525,7 +473,8 @@ pipeline
 				   						def built = build(job: 'test-calo-single-qa',
 							    			parameters:
 							    			[
-								    			string(name: 'build_src', value: "${build_root_path}"), 
+								    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+											string(name: 'build_src', value: "${build_root_path}"), 
 							    				string(name: 'build_type', value: "${build_type}"), 
 							    				string(name: 'system_config', value: "${system_config}"), 
 							    				string(name: 'sha_macros', value: "${sha_macros}"), 
@@ -582,22 +531,24 @@ pipeline
 									when {
 				    				// case insensitive regular expression for truthy values
 										expression { return run_calo_qa ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+										// expression { return false } // temp disable this stage
 									}
 									steps 
 									{
 										script
 										{
 				   						def built = build(job: 'test-tracking-low-occupancy-qa',
-							    			parameters:
-							    			[
-								    			string(name: 'build_src', value: "${build_root_path}"), 
-							    				string(name: 'build_type', value: "${build_type}"), 
-							    				string(name: 'system_config', value: "${system_config}"), 
-							    				string(name: 'sha_macros', value: "${sha_macros}"), 
-		    									string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-				    							string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    							],
-							    			wait: true, propagate: false)
+											parameters:
+											[
+												string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+												string(name: 'build_src', value: "${build_root_path}"), 
+												string(name: 'build_type', value: "${build_type}"), 
+												string(name: 'system_config', value: "${system_config}"), 
+												string(name: 'sha_macros', value: "${sha_macros}"), 
+												string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
+												string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
+											],
+											wait: true, propagate: false)
 						   			
 						   				  copyArtifacts(projectName: 'test-tracking-low-occupancy-qa', selector: specific("${built.number}"));
 						   				  
@@ -643,62 +594,37 @@ pipeline
 								{
 									
 									when {
-				    				// case insensitive regular expression for truthy values
+				    						// case insensitive regular expression for truthy values
 										expression { return run_calo_qa ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
 									}
 									steps 
 									{
 										script
 										{
-				   						def built = build(job: 'test-tracking-high-occupancy-qa',
-							    			parameters:
-							    			[
-								    			string(name: 'build_src', value: "${build_root_path}"), 
-							    				string(name: 'build_type', value: "${build_type}"), 
-							    				string(name: 'system_config', value: "${system_config}"), 
-							    				string(name: 'sha_macros', value: "${sha_macros}"), 
-		    									string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-				    							string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    							],
-							    			wait: true, propagate: false)
-						   			
-						   				  copyArtifacts(projectName: 'test-tracking-high-occupancy-qa', selector: specific("${built.number}"));
-						   				  
-						   				if ("${built.result}" != 'SUCCESS')
-						   				{
-						   					error('test-tracking-high-occupancy-qa FAIL')
-    									}								
+											def built = build(job: 'test-tracking-high-occupancy-qa',
+											parameters:
+											[
+												string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+												string(name: 'build_src', value: "${build_root_path}"), 
+												string(name: 'build_type', value: "${build_type}"), 
+												string(name: 'system_config', value: "${system_config}"), 
+												string(name: 'sha_macros', value: "${sha_macros}"), 
+												string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
+												string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
+											],
+											wait: true, propagate: false)
+
+											  copyArtifacts(projectName: 'test-tracking-high-occupancy-qa', selector: specific("${built.number}"));
+
+											if ("${built.result}" != 'SUCCESS')
+											{
+												error('test-tracking-high-occupancy-qa FAIL')
+											}								
 										}
-										// archiveArtifacts artifacts: 'qa_page.tar.gz'
-										
+										// archiveArtifacts artifacts: 'qa_page.tar.gz'										
 						    		
 										sh('ls -lhv')
 						   			
-						   			//dir('macros/macros/g4simulations/')
-						   			//{
-						   			//	stash name: "test-calo-single-qa-stash", includes: "*"
-						   			//}
-						   			
-						   			//dir('test-calo-single-qa-output')
-						   			//{
-						   			//	unstash "test-calo-single-qa-stash"
-						   			//	archiveArtifacts artifacts: '*', onlyIfSuccessful: true	
-						   			//}    		   			
-						   			
-										//dir('qa_html')
-										//{
-						    		//	sh ("tar xzfv ../qa_page.tar.gz")
-										//}
-				
-									  //publishHTML (target: [
-								    //  allowMissing: false,
-								    //  alwaysLinkToLastBuild: false,
-								    //  keepAll: true,
-								    //  reportDir: 'qa_html',
-								    //  reportFiles: 'index.html',
-								    //  reportName: "Calorimeter QA Report"
-								    //])
-							   			
 									}				
 								}// 				stage('test-tracking-high-occupancy-qa')
 								
@@ -724,7 +650,7 @@ pipeline
 					echo("start report building ...");
 					sh ('pwd');						
 				
-					def report_content = "* [![Build Status ](https://web.racf.bnl.gov/jenkins-sphenix/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Build with configuration of `${system_config}` / `${build_type}` [is ${currentBuild.currentResult}](${env.BUILD_URL})";	        
+					def report_content = "* [![Build Status ](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Build with configuration of `${system_config}` / `${build_type}` [is ${currentBuild.currentResult}](${env.BUILD_URL})";	        
 	        				
 					if ("$build_type" == 'clang') {
 						report_content = "${report_content}, [:bar_chart:clang report (full)](${env.BUILD_URL}/clang/)/[(new)](${env.BUILD_URL}/clang/new/)";
@@ -743,18 +669,44 @@ pipeline
 					{    			
 						String file = fileEntry.path;    				
 
-						String fileContent = readFile(file).trim();
+						//String fileContent = readFile(file);
 
-						echo("$file  -> ${fileContent}");
+						//echo("$file  -> ${fileContent}");
+						
+						def lines = readFile(file).split('\n')
+						
+						for (def line : lines){
+						
+							String fileContent = line;
+							echo("$file  -> |${fileContent}|");
+						    						    
+							// update report summary
+							report_content = "${report_content}\n  ${fileContent}"		//nested list for child reports
 
-						// update report summary
-						report_content = "${report_content}\n  ${fileContent}"		//nested list for child reports
-
-						// update build description
-						currentBuild.description = "${currentBuild.description}\n${fileContent}"		
+							// update build description
+							currentBuild.description = "${currentBuild.description}\n${fileContent}"		
+						}
+						
+	
 					}    			
 
-					writeFile file: "build-${system_config}-${build_type}.md", text: "${report_content}"		
+					writeFile file: "build-${system_config}-${build_type}.md", text: "${report_content}"	
+										
+					build(job: 'github-commit-checkrun',
+						parameters:
+						[
+							string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+							string(name: 'src_Job_id', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+							string(name: 'src_details_url', value: "${env.BUILD_URL}"),
+							string(name: 'checkrun_status', value: "completed"),
+							string(name: 'checkrun_conclusion', value: "${currentBuild.currentResult}"),
+							string(name: 'output_title', value: "sPHENIX Jenkins Report for ${env.JOB_NAME}"),
+							string(name: 'output_summary', value: "[![Build Status ](${env.JENKINS_URL}/buildStatus/icon?job=${env.JOB_NAME}&build=${env.BUILD_NUMBER})](${env.BUILD_URL}) Build with configuration of `${system_config}` / `${build_type}` [is ${currentBuild.currentResult}](${env.BUILD_URL})"),
+							string(name: 'output_text', value: "${currentBuild.displayName}\n\n${currentBuild.description}")
+						],
+						wait: false, propagate: false
+					) // build(job: 'github-commit-checkrun',
+								
 				}//script
 		  	} //dir('report')
 			
@@ -772,6 +724,7 @@ pipeline
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
 				}
         		} // script 
+			
 			
 		} // always
 	
