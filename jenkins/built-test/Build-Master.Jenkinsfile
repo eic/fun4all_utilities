@@ -51,6 +51,7 @@ pipeline
 										
 						dir('build')
 						{
+							sh('chmod -R 755 .')
 							deleteDir()
 						}	
 
@@ -66,23 +67,23 @@ pipeline
 						dir('macros')
 						{
 							deleteDir()
-    				}	
+    						}	
 						dir('calibrations')
 						{
 							deleteDir()
-    				}	
+    						}	
 						dir('tutorials')
 						{
 							deleteDir()
-    				}
+    						}
 						dir('prototype')
 						{
 							deleteDir()
-    				}
+    						}
 						dir('report')
 						{
 							deleteDir()
-    				}
+    						}
 						sh('rm -fv *.*')
 					
 						sh('hostname')
@@ -311,6 +312,42 @@ pipeline
 										}// script
 									}				
 								} // stage('test-default-detector-sPHENIX')
+								
+								
+								stage('test-overlap-check-sPHENIX')
+								{
+									
+									when {
+				    				// case insensitive regular expression for truthy values
+										expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+									}
+									steps 
+									{			    		
+										script
+										{
+											def built = build(job: 'test-overlap-check-pipeline',
+												parameters:
+												[
+													string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+													string(name: 'build_src', value: "${build_root_path}"), 
+													string(name: 'build_type', value: "${build_type}"), 
+													string(name: 'system_config', value: "${system_config}"), 
+													string(name: 'sha_macros', value: "${sha_macros}"), 
+													string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
+													string(name: 'detector_name', value: "sPHENIX"), 
+													string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
+												],
+												wait: true, propagate: false)
+
+											copyArtifacts(projectName: 'test-overlap-check-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
+
+											if ("${built.result}" != 'SUCCESS')
+											{
+												error('test-overlap-check-sPHENIX FAIL')
+											}							
+										}// script
+									}				
+								} // stage('test-overlap-check-sPHENIX')
 								
 								stage('test-default-detector-fsPHENIX')
 								{
@@ -641,6 +678,17 @@ pipeline
 	post {
 		always{
 		  
+	                script {			
+	                	
+				if ("$build_type" == 'clang') {
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clang(pattern: 'build/${build_type}/rebuild.log')
+				} else if ("$build_type" == 'scan') {
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
+				} else {
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
+				}
+        		} // script 
+			
 			dir('report')
 			{
 				sh('ls -lvhc')
@@ -714,16 +762,6 @@ pipeline
 		
 			archiveArtifacts artifacts: 'build/${build_type}/rebuild.log'
 			
-	                script {			
-	                	
-				if ("$build_type" == 'clang') {
-					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clang(pattern: 'build/${build_type}/rebuild.log')
-				} else if ("$build_type" == 'scan') {
-					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
-				} else {
-					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
-				}
-        		} // script 
 			
 			
 		} // always
