@@ -225,6 +225,9 @@ pipeline
 				],
 				wait: false, propagate: false
 			) // build(job: 'github-commit-checkrun',
+			
+			archiveArtifacts artifacts: 'macros/**/*.log'
+
 		}
 		success {
 			build(job: 'github-comment-label',
