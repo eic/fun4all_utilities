@@ -73,7 +73,7 @@ do
 	echo "Build step - build - return $build_ret";
 	
 	
-	if [ $build_ret -ne 0 ]; then
+	if [[ $build_ret -ne 0 ]]; then
 		echo "======================================================="
 		echo "Job index ${id_number}: Failed build with return = ${build_ret}. ";
 		echo "======================================================="
@@ -149,7 +149,7 @@ do
 	sh run.sh ${nbname}
 	
 	build_ret=$?
-	if [ $build_ret -ne 0 ]; then
+	if (( $build_ret != 0 )); then
 		echo "======================================================="
 		echo "${nbname}: Failed build with return = ${build_ret}. ";
 		echo "======================================================="
