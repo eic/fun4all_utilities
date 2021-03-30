@@ -103,11 +103,14 @@ $opt_includecheck = 0;
 $opt_clang = 0;
 $opt_sysname = 'default';
 $opt_cvmfsvol = 'sphenix.sdcc.bnl.gov';
+$opt_actsbranch = 'sPHENIX';
 
 GetOptions('help', 'stage=i', 'afs',
            'version:s', 'tinderbox', 'gittag:s', 'gitbranch:s','source:s',
            'phenixinstall','workdir:s','insure','scanbuild',
-           'coverity','covpasswd:s','notify','64', 'db:i', 'lafiles', 'repoowner:s', 'includecheck', 'clang', 'sysname:s', 'cvmfsvol:s', 'eic');
+           'coverity','covpasswd:s','notify','64', 'db:i', 'lafiles',
+           'repoowner:s', 'includecheck', 'clang', 'sysname:s', 'cvmfsvol:s',
+           'eic', 'actsbranch:s', 'ecce');
 
 if ($opt_help)
   {
@@ -119,6 +122,12 @@ my @gitrepos = ();
 my $repositoryfile = sprintf("%s/repositories.txt",$Bin);
 my $packagefile = sprintf("%s/packages.txt",$Bin);
 my $collaboration = "sPHENIX";
+if ($opt_ecce)
+{
+ $repositoryfile = sprintf("%s/ecce-repositories.txt",$Bin);
+ $packagefile = sprintf("%s/ecce-packages.txt",$Bin);
+ $collaboration = "ECCE-EIC";
+}
 if ($opt_eic)
 {
  $repositoryfile = sprintf("%s/eic-repositories.txt",$Bin);
@@ -358,6 +367,10 @@ if ($opt_phenixinstall && !$opt_scanbuild && !$opt_coverity)
     else
     {
         my $place = sprintf("/cvmfs/%s/%s/release/release_%s/%s",$opt_cvmfsvol,$afs_sysname,$opt_version,$opt_version);
+	if ($opt_ecce)
+	{
+	    $place = sprintf("/cvmfs/%s/ecce/%s/release/release_%s/%s",$opt_cvmfsvol,$afs_sysname,$opt_version,$opt_version);
+	}
         die "$place doesn't exist" unless -e $place;
         my $realpath = realpath($place);
 #    ($linktg,$number) = $realpath =~ m/(.*)\.(\d+)$/;
@@ -428,7 +441,7 @@ else
     {
         if ($repo =~ /acts/)
         {
-            $gitcommand = sprintf("git clone --branch sPHENIX -q https://github.com/%s/%s.git",$repoowner{$repo}, $repo);
+            $gitcommand = sprintf("git clone --branch %s -q https://github.com/%s/%s.git",$opt_actsbranch,$repoowner{$repo}, $repo);
         }
         else
         {
@@ -554,7 +567,7 @@ print LOG "===========================================\n";
         my $G4_MAIN_NOAFSSYS = realpath($G4_MAIN);
         $G4_MAIN_NOAFSSYS =~ s/\@sys/$afs_sysname/;
         #change sphenix to fun4all to make eic happy
-	if ($opt_eic)
+	if ($opt_eic || $opt_ecce)
 	{
 	    $G4_MAIN_NOAFSSYS =~ s/sphenix/fun4all/;
 	    $ROOTSYS_NOAFSSYS =~ s/sphenix/fun4all/;
@@ -574,7 +587,22 @@ print LOG "===========================================\n";
             chdir $dir;
             print LOG "rsyncing $dir\n";
             system("rsync -a . $installDir");
+# needs boost patch
+	    if ($opt_clang)
+	    {
+		$dir = sprintf("/cvmfs/sphenix.sdcc.bnl.gov/%s/patches/%s",$opt_sysname,$externalPackages{$m});
+		if (! -d $dir)
+		{
+		    next;
+		}
+		chdir $dir;
+		print LOG "rsyncing patch $dir\n";
+		system("rsync -a --chmod=Fa-w . $installDir");
+	    }
         }
+        # patch for Eigen include path
+        chdir $installDir . "/include";
+        symlink "eigen3/Eigen", "Eigen";
         # patch for GenFit to install includes in subdir
         $dir = sprintf("%s/genfit2_root-%s",$externalPackagesDir,$rootversion);
         if (! -d $dir)
@@ -808,7 +836,7 @@ if ($opt_stage < 4)
             {
                 if ($opt_includecheck)
                 {
-                    $arg = "make -k CXX='/opt/sphenix/utils/bin/include-what-you-use -I/opt/sphenix/utils/lib/clang/9.0.1/include ' "
+                    $arg = "make -k CXX='include-what-you-use -I/opt/sphenix/utils/lib/clang/11.1.0/include ' "
                 }
                 else
                 {
@@ -981,6 +1009,10 @@ if ($opt_phenixinstall && !$opt_scanbuild && !$opt_coverity)
         my $cvmfscatalognestfile = sprintf("%s/.cvmfscatalog",$installDir);
         system("touch $cvmfscatalognestfile");
         my $releasedir = sprintf("/cvmfs/%s/%s/release",$opt_cvmfsvol,$afs_sysname);
+	if ($opt_ecce)
+	{
+	    $releasedir = sprintf("/cvmfs/%s/ecce/%s/release",$opt_cvmfsvol,$afs_sysname);
+	}
         if ($opt_version =~ /ana/ || $opt_version =~ /pro/ || $opt_version =~ /mdc/)
         {
             my $symlinksource = sprintf("release_%s/%s.%d",$opt_version,$opt_version,$releasenumber);
@@ -1509,12 +1541,15 @@ sub printhelp
     print "                     3 = compile and install \n";
     print "                     4 = run tests \n";
     print "                     5 = install only (scan-build) \n";
+    print "--actsbranch='string' build ACTS from this branch\n";
     print "--afs              install in afs (cvmfs is default)\n";
     print "--clang            use clang instead of gcc\n";
     print "--coverity         Making a coverity build\n";
     print "--covpasswd='string'  the coverity password for the integrity manager\n";
     print "--cvmfsvol='string'  the target cvmfs volume";
     print "--db=[0,1]         Disable/enable access to phnxbld db (default is enable).\n";
+    print "--ecce             build packages for ECCE\n";
+    print "--eic              build packages for generic eic\n";
     print "--gittag='string'  git tag for source checkout.\n";
     print "--gitbranch='string' git branch to be used for build\n";
     print "--includecheck     run the clang based include file checker\n";
@@ -1592,7 +1627,7 @@ sub CreateCmakeCommand
     my $cmakesourcedir = shift;
     if ($packagename =~ /acts/)
     {
-	my $cmakecmd = "cmake -DBOOST_ROOT=${OPT_SPHENIX}/boost -DTBB_ROOT_DIR=${OPT_SPHENIX}/tbb -DEigen3_DIR=${OPT_SPHENIX}/eigen/share/eigen3/cmake -DROOT_DIR=${ROOTSYS}/cmake -DACTS_BUILD_TGEO_PLUGIN=ON -DACTS_BUILD_EXAMPLES=ON -DACTS_BUILD_EXAMPLES_PYTHIA8=ON -DPythia8_INCLUDE_DIR=${OPT_SPHENIX}/pythia8/include -DPythia8_LIBRARY=${OPT_SPHENIX}/pythia8/lib/libpythia8.so -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=$installDir -Wno-dev";
+	my $cmakecmd = "cmake -DBOOST_ROOT=${OFFLINE_MAIN} -DTBB_ROOT_DIR=${OPT_SPHENIX}/tbb -DEigen3_DIR=${OPT_SPHENIX}/eigen/share/eigen3/cmake -DROOT_DIR=${ROOTSYS}/cmake -DACTS_BUILD_TGEO_PLUGIN=ON -DACTS_BUILD_EXAMPLES=ON -DACTS_BUILD_EXAMPLES_PYTHIA8=ON -DPythia8_INCLUDE_DIR=${OFFLINE_MAIN}/include/Pythia8 -DPythia8_LIBRARY=${OFFLINE_MAIN}/lib/libpythia8.so -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=$installDir -Wno-dev";
         if ($opt_version =~ /debug/)
         {
             $cmakecmd = sprintf("%s -DCMAKE_BUILD_TYPE=Debug",$cmakecmd);
@@ -1612,6 +1647,20 @@ sub CreateCmakeCommand
 	    chmod 0755, $runscript;
 	    print LOG "using insure $insurecompiler\n";
 	    $cmakecmd = sprintf("%s -DCMAKE_CXX_COMPILER=%s -DCMAKE_BUILD_TYPE=Debug",$cmakecmd,$runscript);
+	}
+	elsif ($opt_clang)
+	{
+	    my $cxxcompiler = `which clang++`;
+	    chomp $cxxcompiler;
+            my $ccompiler = `which clang`;
+	    chomp $ccompiler;
+	    $cmakecmd = sprintf("%s -DCMAKE_CXX_COMPILER=%s -DCMAKE_C_COMPILER=%s",$cmakecmd,$cxxcompiler,$ccompiler);
+	}
+	elsif ($opt_scanbuild)
+	{
+	    my $cxxcompiler = sprintf("/cvmfs/sphenix.sdcc.bnl.gov/%s/opt/sphenix/utils/stow/llvm-11.1.0/bin/../libexec/c++-analyzer",$opt_sysname);
+	    chomp $cxxcompiler;
+	    $cmakecmd = sprintf("%s -DCMAKE_CXX_COMPILER=%s",$cmakecmd,$cxxcompiler);
 	}
 	elsif (defined $CCACHE_DIR)
 	{
