@@ -271,7 +271,7 @@ pipeline
 
 											if ("${built.result}" != 'SUCCESS')
 											{
-												// error('Build-Clang FAIL')
+												error('Build-Clang FAIL')
 											}										
 			
 										}//script						   			
@@ -303,7 +303,7 @@ pipeline
 						   				
 						   				if ("${built.result}" != 'SUCCESS')
 						   				{
-						   					error('Build-ScanBuild FAIL')
+						   					// error('Build-ScanBuild FAIL')
     									}										
 			
 										}//script						   			

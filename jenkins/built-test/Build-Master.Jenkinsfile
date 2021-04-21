@@ -354,7 +354,8 @@ pipeline
 									
 									when {
 				    				// case insensitive regular expression for truthy values
-										expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
+										// expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
+										expression { return false } // temp assignment to QA switch. Move to run_default_test switch later
 									}
 									steps 
 									{			    		
@@ -384,41 +385,6 @@ pipeline
 						   				    
 									}								
 								}// 				stage('test-default-detector-fsPHENIX')
-								
-								stage('test-default-detector-EICDetector')
-								{
-									
-									when {
-				    				// case insensitive regular expression for truthy values
-										expression { return run_default_test ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } // temp assignment to QA switch. Move to run_default_test switch later
-									}
-									steps 
-									{			    		
-										script
-										{
-				   						def built = build(job: 'test-default-detector-pipeline',
-						    			parameters:
-						    			[
-							    			string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
-										string(name: 'build_src', value: "${build_root_path}"), 
-							    			string(name: 'build_type', value: "${build_type}"), 
-							    			string(name: 'system_config', value: "${system_config}"), 
-							    			string(name: 'sha_macros', value: "${sha_macros}"), 
-		    								string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
-		    								string(name: 'detector_name', value: "EICDetector"), 
-				    						string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
-			    						],
-						    			wait: true, propagate: false)
-						   										
-						   				copyArtifacts(projectName: 'test-default-detector-pipeline', selector: specific("${built.number}"), filter: 'report/*.md');
-						   				if ("${built.result}" != 'SUCCESS')
-						   				{
-						   					error('test-default-detector-EICDetector FAIL')
-    									}							
-										}
-						   				    
-									}								
-								}// 				stage('test-default-detector-EICDetector')
 								
 								
 								stage('test-default-valgrind')
@@ -683,7 +649,7 @@ pipeline
 				if ("$build_type" == 'clang') {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clang(pattern: 'build/${build_type}/rebuild.log')
 				} else if ("$build_type" == 'scan') {
-					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 5, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
 				} else {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
 				}
