@@ -71,7 +71,7 @@ pipeline
 							)//checkout
 						}//						dir('Singularity') {
 						
-						dir('fun4all_macros') {
+						dir('fun4all_eicmacros') {
 							
 							checkout(
 								[
@@ -84,9 +84,9 @@ pipeline
 							    ], 
 							  	userRemoteConfigs: 
 							  	[[
-							    	//credentialsId: 'sPHENIX-bot', url: 'https://github.com/eic/fun4all_macros.git'
+							    	//credentialsId: 'sPHENIX-bot', url: 'https://github.com/eic/fun4all_eicmacros.git'
 							     	credentialsId: 'sPHENIX-bot', 
-							     	url: 'https://github.com/eic/fun4all_macros.git',
+							     	url: 'https://github.com/eic/fun4all_eicmacros.git',
 							     	refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master'), 
 							    	branch: ('*')
 							  	]]
@@ -142,7 +142,7 @@ source /cvmfs/eic.opensciencegrid.org/gcc-8.3/opt/fun4all/core/bin/eic_setup.sh 
 
 env;
 
-cd ../fun4all_macros/detectors/EICDetector/
+cd ../fun4all_eicmacros/detectors/EICDetector/
 ls -lhvc
 
 root -b -q Fun4All_G4_EICDetector.C
