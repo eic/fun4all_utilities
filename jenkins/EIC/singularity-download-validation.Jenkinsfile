@@ -23,7 +23,7 @@ pipeline
 							
 						}
 										
-						dir('macros') {
+						dir('fun4all_eicmacros') {
 							deleteDir()
 						}
 						dir('Singularity') {
