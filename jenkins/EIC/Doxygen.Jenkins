@@ -531,7 +531,8 @@ pipeline
 							{
 								checkout(
 									[
-										$class: 'GitSCM',
+										$class: 'GitSCM', 
+										branches: [[name: '*/main']],
 										extensions: [               
 											[$class: 'CleanBeforeCheckout'], 
 											[$class: 'CleanCheckout'],
@@ -541,7 +542,6 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/east.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/main:refs/remotes/origin/main')
 										]]
 									] //checkout
 								)//checkout			
