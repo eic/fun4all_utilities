@@ -69,7 +69,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_coresoftware.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout				
@@ -89,7 +89,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_tutorials.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -110,7 +110,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_macros.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -130,7 +130,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_eicmacros.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -150,7 +150,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_eic_qa.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -170,7 +170,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/online_distribution.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -191,7 +191,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_acts.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -211,7 +211,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/g4lblvtx.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -231,7 +231,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/g4exampledetector.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -253,7 +253,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_g4jleic.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -274,7 +274,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/Fun4All-lmon.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -294,7 +294,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_GenFit.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -315,7 +315,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/BeastMagneticField.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -336,7 +336,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/PEPSI.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -356,7 +356,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/eic-smear.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -376,7 +376,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/eicsmear-jetexample.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -396,7 +396,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_eicdetectors.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -417,7 +417,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/fun4all_eic_tutorials.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -438,7 +438,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/eicsmeardetectors.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -459,7 +459,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/EicRoot.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -480,7 +480,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/delphes_EIC.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -501,7 +501,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/EicToyModel.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
@@ -521,7 +521,7 @@ pipeline
 										[[
 										credentialsId: 'sPHENIX-bot', 
 										url: 'https://github.com/eic/estarlight.git',
-										refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master')
+										refspec: ('+refs/heads/master:refs/remotes/origin/master')
 										]]
 									] //checkout
 								)//checkout			
