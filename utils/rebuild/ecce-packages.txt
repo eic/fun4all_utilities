@@ -24,6 +24,7 @@ coresoftware/offline/packages/PHField|jhuang@bnl.gov
 # simulations
 # simulations/generator
 coresoftware/generators/phhepmc|pinkenburg@bnl.gov
+coresoftware/generators/decayFinder|cdean@bnl.gov
 # fermi motion uses phhepmc
 coresoftware/generators/FermiMotionAfterburner|sl4859@columbia.edu
 #PHPythia8 needs phhepmc
@@ -105,3 +106,5 @@ fun4all_eicdetectors/simulation/g4simulation/g4drich|cdean@bnl.gov
 fun4all_eicdetectors/simulation/g4simulation/g4trd|cdean@bnl.gov
 fun4all_eicdetectors/simulation/g4simulation/g4b0|cdean@bnl.gov
 ecce-detectors/FastPID|jhuang@bnl.gov
+fun4all_eicdetectors/simulation/g4simulation/g4barrelmmg|cdean@bnl.gov
+fun4all_eicdetectors/simulation/g4simulation/g4etof|cdean@bnl.gov

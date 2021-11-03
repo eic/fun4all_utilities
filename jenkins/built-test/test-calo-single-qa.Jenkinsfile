@@ -168,8 +168,6 @@ pipeline
 							  	[[
 							     	credentialsId: 'sPHENIX-bot', 
 							     	url: '${git_url_macros}',
-							     	refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/master:refs/remotes/origin/master'), 
-							    	branch: ('*')
 							  	]]
 								] //checkout
 							)//checkout
@@ -185,6 +183,7 @@ pipeline
 						 			$class: 'GitSCM',
 						   		extensions: [               
 							   		[$class: 'CleanCheckout'],  
+									[$class: 'CloneOption', timeout: 30, shallow: true]
 						   		],
 							  	branches: [
 							    		[name: "${sha_QA_gallery}"]
@@ -193,8 +192,7 @@ pipeline
 							  	[[
 							     	credentialsId: 'sPHENIX-bot', 
 							     	url: '${git_url_QA_gallery}',
-							     	refspec: ('+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/main:refs/remotes/origin/main'), 
-							    	branch: ('*')
+							     	refspec: ('+refs/heads/${sha_QA_gallery}:refs/remotes/origin/${sha_QA_gallery}'),
 							  	]]
 								] //checkout
 							)//checkout
