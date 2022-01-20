@@ -8,6 +8,7 @@ coresoftware/offline/framework/phool|pinkenburg@bnl.gov
 coresoftware/offline/framework/phoolraw|pinkenburg@bnl.gov
 coresoftware/offline/database/pdbcal/base|pinkenburg@bnl.gov
 coresoftware/offline/database/pdbcal/pg|pinkenburg@bnl.gov
+coresoftware/offline/database/dbtools|pinkenburg@bnl.gov
 coresoftware/offline/database/PHParameter|pinkenburg@bnl.gov
 coresoftware/offline/packages/vararray|pinkenburg@bnl.gov
 coresoftware/offline/framework/frog|pinkenburg@bnl.gov
@@ -68,6 +69,9 @@ coresoftware/offline/packages/PHGenFitPkg/PHGenFit|pinkenburg@bnl.gov
 coresoftware/simulation/g4simulation/g4vertex|pinkenburg@bnl.gov
 coresoftware/simulation/g4simulation/g4jets|dvp@bnl.gov
 coresoftware/offline/packages/jetbackground|dvp@bnl.gov
+# centrality needs trackbase_historic
+coresoftware/offline/packages/centrality|dvp@bnl.gov
+coresoftware/simulation/g4simulation/g4centrality|dvp@bnl.gov
 # simulations/Geant4/ evals
 coresoftware/simulation/g4simulation/g4eval|pinkenburg@bnl.gov
 coresoftware/simulation/g4simulation/g4trackfastsim|jhuang@bnl.gov
@@ -84,8 +88,6 @@ coresoftware/offline/packages/CaloReco|jhuang@bnl.gov
 coresoftware/offline/packages/ClusterIso|dvp@bnl.gov
 # calorimeters and tracking combined
 coresoftware/offline/packages/particleflow|dvp@bnl.gov
-#calibrations
-coresoftware/calibrations/tpc/generator|ross.corliss@stonybrook.edu
 # Simulation and Offline software for calorimeter/T1044 
 prototype/simulation/g4simulation/g4caloprototype|jhuang@bnl.gov
 prototype/offline/packages/Prototype2|jhuang@bnl.gov
@@ -96,6 +98,8 @@ coresoftware/offline/QA/modules|jhuang@bnl.gov
 # calibrations
 coresoftware/calibrations/calorimeter/calo_tower_slope|frantz@ohio.edu
 coresoftware/calibrations/calorimeter/calo_emc_pi0_tbt|frantz@ohio.edu
+coresoftware/calibrations/tpc/generator|ross.corliss@stonybrook.edu
+coresoftware/calibrations/tpc/fillSpaceChargeMaps|mohaas33@gmail.com
 # the dumping needs all objects and comes last
 coresoftware/offline/packages/NodeDump|pinkenburg@bnl.gov
 # this is the convenience library which loads all libraries needed for reading

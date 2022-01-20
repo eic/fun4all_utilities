@@ -58,7 +58,7 @@ do
 	echo "${job_name}: Start test";
 	echo "======================================================="
   
-  	(/usr/bin/time -v root -b -q "Fun4All_G4_sPHENIX.C(${num_event},"\"NullInput\"","\"G4sPHENIX_${job_name}\"")" && echo $? > exit_code_${id_number}.log ) 2>&1 | tee G4sPHENIX_${job_name}.log | (head; tail -n 100)  &
+  	(/usr/bin/time -v  timeout --preserve-status --kill-after=1s --signal=9 1d  root.exe -b -q "Fun4All_G4_sPHENIX.C(${num_event},"\"NullInput\"","\"G4sPHENIX_${job_name}\"")" && echo $? > exit_code_${id_number}.log ) 2>&1 | tee G4sPHENIX_${job_name}.log | (head; tail -n 100)  &
 	
   	sleep 1s;
 	((id_number++))
@@ -117,7 +117,7 @@ echo "======================================================="
 
 export qa_file_name_ref='None';
 echo "use reference = ${use_reference}"
-if [ ${use_reference} ]; then
+if [[ "${use_reference}" == "true" ]]; then
 	ln -svfb ../reference
 	
 	export qa_file_name_ref=`/bin/ls -1 reference/G4sPHENIX_*Sum*_qa.root`
@@ -147,6 +147,8 @@ git status
 sh setup.sh 
 
 source ./env/bin/activate
+
+env
 
 echo "======================================================="
 echo "${name}: Drawing G4sPHENIX_${name}_qa.root";

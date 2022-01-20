@@ -420,8 +420,7 @@ pipeline
 												currentBuild.result = "${built.getResult()}"
 												error("test-default-detector-valgrind-pipeline #${built.number} ${built.getResult()}");
 											}
-										}
-						   				    
+										}						   				    
 									}				
 								}
 								
@@ -631,6 +630,45 @@ pipeline
 									}				
 								}// 				stage('test-tracking-high-occupancy-qa')
 								
+								
+								stage('test-tracking-pythiajet-qa')
+								{
+									
+									when {
+				    				// case insensitive regular expression for truthy values
+										expression { return run_calo_qa ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ }
+										// expression { return false } // temp disable this stage
+									}
+									steps 
+									{
+										script
+										{
+											def built = build(job: 'test-tracking-pythiajet-qa',
+												parameters:
+												[
+													string(name: 'checkrun_repo_commit', value: "${checkrun_repo_commit}"), 
+													string(name: 'build_src', value: "${build_root_path}"), 
+													string(name: 'build_type', value: "${build_type}"), 
+													string(name: 'system_config', value: "${system_config}"), 
+													string(name: 'sha_macros', value: "${sha_macros}"), 
+													string(name: 'ghprbPullLink', value: "${ghprbPullLink}"), 
+													string(name: 'upstream_build_description', value: "${upstream_build_description} / <a href=\"${env.JOB_URL}\">${env.JOB_NAME}</a>.<a href=\"${env.BUILD_URL}\">#${env.BUILD_NUMBER}</a>")
+												],
+												wait: true, propagate: false)
+
+											copyArtifacts(projectName: 'test-tracking-pythiajet-qa', selector: specific("${built.number}"));
+
+											if ("${built.result}" != 'SUCCESS')
+											{
+												error('test-tracking-pythiajet-qa FAIL')
+											}								
+										}
+										sh('ls -lhv')
+									}				
+								}// 				stage('test-tracking-pythiajet-qa')
+							
+								
+								
 							}// parallel			
 						}// stage - Test
 		
@@ -649,7 +687,7 @@ pipeline
 				if ("$build_type" == 'clang') {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clang(pattern: 'build/${build_type}/rebuild.log')
 				} else if ("$build_type" == 'scan') {
-					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 2, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
+					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: clangAnalyzer(pattern: 'build/${build_type}/scanlog/*/*.plist')
 				} else {
 					recordIssues enabledForFailure: true, failedNewHigh: 1, failedNewNormal: 1, tool: gcc(pattern: 'build/${build_type}/rebuild.log')
 				}

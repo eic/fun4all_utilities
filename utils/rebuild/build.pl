@@ -1075,15 +1075,16 @@ NORELEASEFILE:
     open(LOG, ">>$logfile");
     print LOG "$date initiating release, touching $releasefile\n";
     system("touch $releasefile");
-    my $n=70;
+    my $totalcycles=180;
+    my $n = $totalcycles;
     while($n > 0)
     {
-        sleep(30);
+        sleep(60);
         if (! -f $releasefile)
         {
             chomp (my $date = `date`);
-            my $cycles = 70-$n;
-            print LOG "$date build is released after $cycles cycles\n";
+            my $cycles = $totalcycles - $n;
+            print LOG "$date build is released after $cycles minutes\n";
             goto END;
         }
         chomp (my $date = `date`);
@@ -1091,8 +1092,8 @@ NORELEASEFILE:
         $n--;
     }
     chomp ($date = `date`);
-    print LOG "$date $releasefile still exists, giving up and failing build $n\n";
-    $buildSucceeded=0;
+    print LOG "$date $releasefile still exists, giving up waiting it will ultimately happen\n";
+    $buildSucceeded=1;
     goto END;
 
 }
@@ -1356,7 +1357,7 @@ sub install_coverity_reports
     }
     else
     {
-        my $installroot = sprintf("/phenix/WWW/p/draft/phnxbld/%s/coverity/report",$collaboration);
+        my $installroot = sprintf("/sphenix/WWW/user/phnxbld/build-reports/%s/coverity/report",$collaboration);
         my $realpath = realpath($installroot);
         (my $inst,my $number) = $realpath =~ m/(.*)\.(\d+)$/;
         my $newnumber = ($number % 2) + 1;
@@ -1427,13 +1428,13 @@ sub install_coverity_reports
         }
         close(F1);
         unlink $inst if (-e $inst);
-        symlink $installdir, $inst;
+        symlink basename($installdir), $inst;
     }
 }
 
 sub install_scanbuild_reports
 {
-    my $installroot = sprintf("/phenix/WWW/p/draft/phnxbld/%s/scan-build/scan",$collaboration);
+    my $installroot = sprintf("/sphenix/WWW/user/phnxbld/build-reports/%s/scan-build/scan",$collaboration);
     my $realpath = realpath($installroot);
     (my $inst,my $number) = $realpath =~ m/(.*)\.(\d+)$/;
     my $newnumber = ($number % 2) + 1;
@@ -1485,7 +1486,7 @@ sub install_scanbuild_reports
             print F "<a href=\"$hrefentry\">$packages</a> contact: $contact{$packagename} </br>\n";
             if (exists $contact{$packagename})
             {
-                $mailinglist{$packagename} = sprintf("https://phenix-intra.sdcc.bnl.gov/WWW/p/draft/phnxbld/%s/scan-build/scan/%s",$collaboration,$hrefentry);
+                $mailinglist{$packagename} = sprintf("https://sphenix-intra.sdcc.bnl.gov/WWW/user/phnxbld/build-reports/%s/scan-build/scan/%s",$collaboration,$hrefentry);
             }
             else
             {
@@ -1495,7 +1496,7 @@ sub install_scanbuild_reports
     }
     close(F);
     unlink $inst if (-e $inst);
-    symlink $installdir, $inst;
+    symlink basename($installdir), $inst;
 # now send the mails
     if ($opt_notify)
     {
@@ -1519,7 +1520,7 @@ sub install_scanbuild_reports
             print MAIL "The report is under\n\n";
             print MAIL "$mailinglist{$package}\n\n";
             print MAIL "All reports are available under\n\n";
-            print MAIL "https://phenix-intra.sdcc.bnl.gov/WWW/p/draft/phnxbld/",$collaboration,"/scan-build/scan\n\n";
+            print MAIL "https://sphenix-intra.sdcc.bnl.gov/WWW/user/phnxbld/build-reports/",$collaboration,"/scan-build/scan\n\n";
             print MAIL "instructions how to run scan-build yourself are in our wiki\n\n";
             print MAIL "https://wiki.bnl.gov/sPHENIX/index.php/Tools#scan_build\n\n";
             print MAIL "Please look at the report and fix the issues found\n";
@@ -1624,7 +1625,12 @@ sub CreateCmakeCommand
     my $cmakesourcedir = shift;
     if ($packagename =~ /acts/)
     {
-	my $cmakecmd = sprintf("cmake -DBOOST_ROOT=${OFFLINE_MAIN} -DTBB_ROOT_DIR=${OPT_SPHENIX}/%s -DEigen3_DIR=${OPT_SPHENIX}/eigen/share/eigen3/cmake -DROOT_DIR=${ROOTSYS}/cmake -DACTS_BUILD_TGEO_PLUGIN=ON -DACTS_BUILD_EXAMPLES=ON -DACTS_BUILD_EXAMPLES_PYTHIA8=ON -DPythia8_INCLUDE_DIR=${OFFLINE_MAIN}/include/Pythia8 -DPythia8_LIBRARY=${OFFLINE_MAIN}/lib/libpythia8.so -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=$installDir -Wno-dev",$externalPackages{"tbb"});
+        my $clhep_version = `clhep-config --version`;
+        chomp $clhep_version;
+        $clhep_version =~ s/ /-/;
+        my $g4version = `geant4-config --version`;
+        chomp $g4version;
+	my $cmakecmd = sprintf("cmake -DBOOST_ROOT=${OFFLINE_MAIN} -DTBB_ROOT_DIR=${OFFLINE_MAIN} -DEigen3_DIR=${OFFLINE_MAIN}/share/eigen3/cmake -DROOT_DIR=${ROOTSYS}/cmake -DACTS_BUILD_TGEO_PLUGIN=ON -DACTS_BUILD_EXAMPLES=ON -DACTS_BUILD_EXAMPLES_PYTHIA8=ON -DPythia8_INCLUDE_DIR=${OFFLINE_MAIN}/include/Pythia8 -DPythia8_LIBRARY=${OFFLINE_MAIN}/lib/libpythia8.so -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DACTS_BUILD_PLUGIN_DD4HEP=ON -DACTS_BUILD_EXAMPLES_DD4HEP=ON -DCMAKE_CXX_STANDARD=17 -DACTS_BUILD_EXAMPLES_GEANT4=ON -DDD4hep_DIR=${OFFLINE_MAIN}/cmake -DGeant4_DIR=${G4_MAIN}/lib64/Geant4-$g4version -DCLHEP_DIR=${OFFLINE_MAIN}/lib/$clhep_version -DCMAKE_INSTALL_PREFIX=$installDir -Wno-dev",$externalPackages{"tbb"});
         if ($opt_version =~ /debug/)
         {
             $cmakecmd = sprintf("%s -DCMAKE_BUILD_TYPE=Debug",$cmakecmd);
