@@ -136,6 +136,27 @@ pipeline
 								)//checkout			
 							} // dir 
 							
+							
+							dir('acts')
+							{
+								checkout(
+									[
+										$class: 'GitSCM',
+										branches: [[name: '*/sPHENIX']],
+										extensions: [               
+											[$class: 'CleanBeforeCheckout'], 
+											[$class: 'CleanCheckout'],
+											[$class: 'RelativeTargetDirectory', relativeTargetDir: 'blob/sPHENIX/']										
+										],
+										userRemoteConfigs: 
+										[[
+										credentialsId: 'sPHENIX-bot', 
+										url: 'https://github.com/eic/acts.git',
+										]]
+									] //checkout
+								)//checkout			
+							} // dir 
+							
 							dir('fun4all_eic_qa')
 							{
 								checkout(
